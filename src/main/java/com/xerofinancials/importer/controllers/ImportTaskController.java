@@ -34,10 +34,11 @@ public class ImportTaskController {
         return "tasks.html";
     }
 
+    //todo: delete
     @GetMapping("test")
     public String testImportTask() throws IOException {
         logger.info("Will be launched task...");
-        final TestImportTask task = new TestImportTask(apiWrapper);
+        final TestImportTask task = new TestImportTask(apiWrapper, tokenStorage);
         task.execute();
         return "redirect:/task/all";
     }

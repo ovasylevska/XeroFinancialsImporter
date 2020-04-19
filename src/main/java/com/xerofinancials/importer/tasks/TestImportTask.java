@@ -15,6 +15,7 @@ import com.xero.models.accounting.Items;
 import com.xero.models.accounting.LineItem;
 import com.xero.models.accounting.ValidationError;
 import com.xerofinancials.importer.xeroapi.XeroApiWrapper;
+import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +26,21 @@ import java.util.UUID;
 public class TestImportTask {
     private static final Logger logger = LoggerFactory.getLogger(TestImportTask.class);
     private final XeroApiWrapper xeroApiWrapper;
+    private final TokenStorage tokenStorage;
 
-    public TestImportTask(final XeroApiWrapper xeroApiWrapper) {
+    public TestImportTask(
+            final XeroApiWrapper xeroApiWrapper,
+            final TokenStorage tokenStorage
+    ) {
         this.xeroApiWrapper = xeroApiWrapper;
+        this.tokenStorage = tokenStorage;
     }
 
     public void execute() throws IOException {
         try {
+            if (!tokenStorage.isAuthentificated()) {
+                throw new RuntimeException("Application is not Authenticated!");
+            }
             addBankTransaction();
             readBankTransactions();
         } catch (XeroApiException e) {

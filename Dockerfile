@@ -10,5 +10,5 @@ FROM openjdk:8
 VOLUME /tmp
 EXPOSE 8080
 COPY /src/main/resources/application.properties ./application.properties
-COPY --from=GRADLE_BUILDER /home/gradle/src/build/libs/XeroFinancialsImpoerter-1.0.jar /
-ENTRYPOINT ["java","-Xmx1g","-jar","XeroFinancialsImpoerter-1.0.jar"]
+COPY --from=GRADLE_BUILDER /home/gradle/src/build/libs/XeroFinancialsImporter-1.0.jar /
+ENTRYPOINT ["java","-Xmx512m","-jar","XeroFinancialsImporter-1.0.jar"]

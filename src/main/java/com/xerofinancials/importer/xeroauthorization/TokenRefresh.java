@@ -34,15 +34,17 @@ public class TokenRefresh {
     }
 
     public String getAndRefreshIfNeeded(String accessToken, String refreshToken) throws IOException {
-        if (accessToken != null && !accessToken.isEmpty()) {
-            try {
-                final DecodedJWT jwt = JWT.decode(accessToken);
-                if (jwt.getExpiresAt().getTime() > System.currentTimeMillis()) {
-                    return accessToken;
-                }
-            } catch (JWTDecodeException exception) {
-                logger.error("Error: " + exception.getMessage());
+        if (accessToken == null || refreshToken == null) {
+            return null;
+        }
+
+        try {
+            final DecodedJWT jwt = JWT.decode(accessToken);
+            if (jwt.getExpiresAt().getTime() > System.currentTimeMillis()) {
+                return accessToken;
             }
+        } catch (JWTDecodeException exception) {
+            logger.error("Error: " + exception.getMessage());
         }
 
         try {

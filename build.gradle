@@ -32,7 +32,7 @@ dependencies {
 }
 
 bootJar {
-    mainClassName = 'com.xerofinancials.importer.XeroFinancialsImporterApplication.java'
+    mainClassName = 'com.xerofinancials.importer.XeroFinancialsImporterApplication'
 }
 
 dockerCompose {

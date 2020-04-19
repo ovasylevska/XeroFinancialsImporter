@@ -29,8 +29,8 @@ services:
       dockerfile: Dockerfile
     restart: on-failure
     environment:
-      - database.xero_financials.url=jdbc:mysql://database-importer:5432/xero_financials
-      - database.xero_importer.url=jdbc:mysql://database-importer:5432/xero_financials
+      - database.xero_financials.url=jdbc:postgresql://database-importer:5432/xero_financials
+      - database.xero_importer.url=jdbc:postgresql://database-importer:5432/xero_financials
       - database.xero_financials.password=xfi_2020
       - database.xero_importer.password=xfi_2020
     networks:
