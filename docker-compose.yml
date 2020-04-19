@@ -1,0 +1,41 @@
+version: '2.2'
+
+services:
+  database-importer:
+    volumes:
+      - ./importer-database-volume:/var/lib/postgresql
+    container_name: xero-financials-importer-db
+    image: postgres:11
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=xfi_2020
+      - POSTGRES_DB=xero_financials
+    ports:
+      - 5433:5432
+    networks:
+      - xero-financials-importer-network
+  application-importer:
+    container_name: xero-financials-importer-app
+    volumes:
+      - /tmp
+    depends_on:
+      - database-importer
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    environment:
+      - database.xero_financials.url=jdbc:mysql://database-importer:5432/xero_financials
+      - database.xero_importer.url=jdbc:mysql://database-importer:5432/xero_financials
+      - database.xero_financials.password=xfi_2020
+      - database.xero_importer.password=xfi_2020
+    networks:
+      - xero-financials-importer-network
+networks:
+  xero-financials-importer-network:
+volumes:
+  importer-database-volume:

@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id "com.avast.gradle.docker-compose" version "0.9.5"
+}
+
+group 'XeroFinancialsImporter'
+version '1.0'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: '2.2.4.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.2.4.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.2.4.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '2.2.4.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.2.4.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '2.2.4.RELEASE'
+    
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.12'
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '6.0.4'
+
+    compile('com.github.xeroapi:xero-java:3.5.2') {
+        exclude group: 'javax.servlet'
+    }
+
+    testCompile group: 'org.springframework', name: 'spring-test', version: '5.2.3.RELEASE'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+bootJar {
+    mainClassName = 'com.xerofinancials.importer.XeroFinancialsImporterApplication.java'
+}
+
+dockerCompose {
+    useComposeFiles = ['docker-compose.yml']
+    waitForTcpPorts = true
+}

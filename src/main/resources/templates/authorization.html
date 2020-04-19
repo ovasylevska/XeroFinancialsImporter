@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xero Financials Importer - Xero Authorization</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"
+          type="text/css"/>
+</head>
+<body>
+
+<div class="card">
+    <div class="card-body">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-8 col-form-label" for="clientId">Client Id</label>
+                <input type="text" class="col-md-8" id="clientId" th:value="${clientId}">
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-8 col-form-label" for="clientSecret">Client Secret</label>
+                <input type="text" class="col-md-8" id="clientSecret" th:value="${clientSecret}">
+            </div>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-8 col-form-label" for="redirectURI">Redirect URI</label>
+                <input type="text" class="col-md-8" id="redirectURI" th:value="${redirectURI}">
+            </div>
+        </div>
+
+        <div th:if="${redirect != null}" style="padding-left: 15px;">
+            <a th:href="${redirect}" class="btn btn-info">Authorize Application</a>
+        </div>
+
+        <div th:if="${redirect == null}" style="padding-left: 15px;">
+            <a th:href="${redirect}" class="btn btn-primary disabled">Application is Authorized</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
