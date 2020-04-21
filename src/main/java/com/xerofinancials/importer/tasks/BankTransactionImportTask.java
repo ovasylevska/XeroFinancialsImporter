@@ -11,6 +11,7 @@ import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
 import com.xerofinancials.importer.repository.LineItemRepository;
+import com.xerofinancials.importer.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,17 +25,21 @@ public abstract class BankTransactionImportTask extends ImportTask {
     protected final ContactRepository contactRepository;
     protected final BankAccountRepository bankAccountRepository;
     protected final LineItemRepository lineItemRepository;
+    protected final EmailService emailService;
 
     protected BankTransactionImportTask(
             final FinancialsBankTransactionRepository bankTransactionRepository,
             final ContactRepository contactRepository,
             final BankAccountRepository bankAccountRepository,
-            final LineItemRepository lineItemRepository
+            final LineItemRepository lineItemRepository,
+            final EmailService emailService
     ) {
+        super(emailService);
         this.bankTransactionRepository = bankTransactionRepository;
         this.contactRepository = contactRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.lineItemRepository = lineItemRepository;
+        this.emailService = emailService;
     }
 
     @Override

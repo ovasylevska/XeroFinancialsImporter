@@ -12,6 +12,7 @@ import com.xero.models.accounting.Item;
 import com.xero.models.accounting.Items;
 import com.xero.models.accounting.LineItem;
 import com.xerofinancials.importer.enums.XeroDataType;
+import com.xerofinancials.importer.service.EmailService;
 import com.xerofinancials.importer.xeroapi.XeroApiWrapper;
 import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
@@ -26,13 +27,17 @@ public class TestImportTask extends ImportTask{
     private static final Logger logger = LoggerFactory.getLogger(TestImportTask.class);
     private final XeroApiWrapper xeroApiWrapper;
     private final TokenStorage tokenStorage;
+    private final EmailService emailService;
 
     public TestImportTask(
             final XeroApiWrapper xeroApiWrapper,
-            final TokenStorage tokenStorage
+            final TokenStorage tokenStorage,
+            final EmailService emailService
     ) {
+        super(emailService);
         this.xeroApiWrapper = xeroApiWrapper;
         this.tokenStorage = tokenStorage;
+        this.emailService = emailService;
     }
 
     public void execute() {

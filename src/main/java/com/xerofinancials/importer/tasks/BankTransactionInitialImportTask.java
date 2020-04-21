@@ -2,11 +2,13 @@ package com.xerofinancials.importer.tasks;
 
 import com.xero.api.XeroApiException;
 import com.xero.models.accounting.BankTransactions;
+import com.xerofinancials.importer.beans.ImportStatistics;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
 import com.xerofinancials.importer.repository.LineItemRepository;
 import com.xerofinancials.importer.repository.TaskLaunchHistoryRepository;
+import com.xerofinancials.importer.service.EmailService;
 import com.xerofinancials.importer.xeroapi.XeroApiWrapper;
 import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
@@ -22,6 +24,7 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
     private final XeroApiWrapper xeroApiWrapper;
     private final TokenStorage tokenStorage;
     private final TaskLaunchHistoryRepository taskLaunchHistoryRepository;
+    private final EmailService emailService;
 
     public BankTransactionInitialImportTask(
             final XeroApiWrapper xeroApiWrapper,
@@ -30,12 +33,13 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
             final ContactRepository contactRepository,
             final BankAccountRepository bankAccountRepository,
             final LineItemRepository lineItemRepository,
-            final TaskLaunchHistoryRepository taskLaunchHistoryRepository
-    ) {
-        super(bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository);
+            final TaskLaunchHistoryRepository taskLaunchHistoryRepository,
+            final EmailService emailService) {
+        super(bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
         this.xeroApiWrapper = xeroApiWrapper;
         this.tokenStorage = tokenStorage;
         this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -62,10 +66,13 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
     private void processBankTransactionData() throws IOException {
         final Counter pageCount = new Counter(1);
         final Counter resultsCount = new Counter(Integer.MAX_VALUE);
+        final ImportStatistics importStatistics = new ImportStatistics();
         while(resultsCount.get() > 0) {
             final BankTransactions bankTransactionData = readBankTransactionData(pageCount, resultsCount);
             saveBankTransactionData(bankTransactionData);
+            importStatistics.increaseNewBankTransactionsCount(bankTransactionData.getBankTransactions().size());
         }
+        this.importStatistics = importStatistics;
     }
 
     private BankTransactions readBankTransactionData(

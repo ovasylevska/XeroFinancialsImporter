@@ -16,14 +16,20 @@ public class XeroApiWrapper {
 
     private final TokenStorage tokenStorage;
     private final TokenRefresh tokenRefresh;
+    private final XeroApiLimitWatcher limitWatcher;
     private final ApiClient defaultClient = new ApiClient();
     private final AccountingApi accountingApi = AccountingApi.getInstance(defaultClient);
     private String accessToken;
     private String tenantId;
 
-    public XeroApiWrapper(final TokenStorage tokenStorage, final TokenRefresh tokenRefresh) {
+    public XeroApiWrapper(
+            final TokenStorage tokenStorage,
+            final TokenRefresh tokenRefresh,
+            final XeroApiLimitWatcher limitWatcher
+    ) {
         this.tokenStorage = tokenStorage;
         this.tokenRefresh = tokenRefresh;
+        this.limitWatcher = limitWatcher;
     }
 
     public <T> T executeApiCall(XeroApiCall<T> call) throws IOException {
@@ -32,7 +38,7 @@ public class XeroApiWrapper {
         } catch (IOException e) {
             logger.error("Exception while executing Xero api call : " + e.getMessage());
         }
-        //todo: handle api limits
+        limitWatcher.watch();
         return call.execute(accountingApi, this.accessToken, this.tenantId);
     }
 
