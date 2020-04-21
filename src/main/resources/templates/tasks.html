@@ -19,6 +19,7 @@
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css"
           type="text/css"/>
+    <script src="/js/update_task_statuses.js"></script>
 </head>
 <body>
 
@@ -49,7 +50,7 @@
                     <label class="col-sm-8 col-form-label" for="initialImportTask">Initial Import Task</label>
                 </td>
                 <td>
-                    <a id="initialImportTask" href="/task/initial" class="btn btn-info">Run</a>
+                    <a id="initialImportTask" href="/task/initial" class="btn btn-info" name="runTask">Run</a>
                 </td>
             </tr>
 
@@ -58,7 +59,7 @@
                     <label class="col-sm-8 col-form-label" for="initialImportTask">Delta Import Task</label>
                 </td>
                 <td>
-                    <a id="deltaImportTask" href="/task/delta" class="btn btn-info">Run</a>
+                    <a id="deltaImportTask" href="/task/delta" class="btn btn-info" name="runTask">Run</a>
                 </td>
             </tr>
 
@@ -68,7 +69,7 @@
                         Task</label>
                 </td>
                 <td>
-                    <a id="reconciliationImportTask" href="/task/reconciliation" class="btn btn-info">Run</a>
+                    <a id="reconciliationImportTask" href="/task/reconciliation" class="btn btn-info" name="runTask">Run</a>
                 </td>
             </tr>
 

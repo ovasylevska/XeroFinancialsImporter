@@ -3,11 +3,15 @@ package com.xerofinancials.importer.beans;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmailNotificationRecipients {
+public class EmailNotificationConfigs {
     private List<String> errorRecipients = new ArrayList<>();
     private List<String> notificationRecipients = new ArrayList<>();
     private String user;
     private String password;
+    private String host;
+    private Integer port;
+    private String socketFactoryClass;
+    private Integer socketFactoryPort;
 
     public List<String> getErrorRecipients() {
         return errorRecipients;
@@ -39,5 +43,38 @@ public class EmailNotificationRecipients {
 
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(final String host) {
+        this.host = host;
+    }
+
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(final Integer port) {
+        this.port = port;
+    }
+
+    public String getSocketFactoryClass() {
+        return socketFactoryClass;
+    }
+
+    public void setSocketFactoryClass(final String socketFactoryClass) {
+        this.socketFactoryClass = socketFactoryClass;
+    }
+
+    public Integer getSocketFactoryPort() {
+        return socketFactoryPort;
+    }
+
+    public void setSocketFactoryPort(final Integer socketFactoryPort) {
+        this.socketFactoryPort = socketFactoryPort;
     }
 }

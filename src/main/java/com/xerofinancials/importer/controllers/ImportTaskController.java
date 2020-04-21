@@ -69,11 +69,15 @@ public class ImportTaskController {
         return "redirect:/task/all";
     }
 
+    //todo: move to some kind of task repository
     private boolean isAnyTaskRunning() {
         if (initialImportTask.getIsRunning()) {
             return true;
         }
         if (reconciliationTask.getIsRunning()) {
+            return true;
+        }
+        if (deltaImportTask.getIsRunning()) {
             return true;
         }
         return false;

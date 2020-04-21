@@ -1,6 +1,6 @@
 package com.xerofinancials.importer.configs;
 
-import com.xerofinancials.importer.beans.EmailNotificationRecipients;
+import com.xerofinancials.importer.beans.EmailNotificationConfigs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,17 +9,25 @@ import org.springframework.context.annotation.Configuration;
 public class EmailConfig {
 
     @Bean
-    public EmailNotificationRecipients emailNotificationRecipients(
+    public EmailNotificationConfigs emailNotificationRecipients(
             @Value("${email.error.recipient}") String errorRecipient,
             @Value("${email.notification.recipient}") String notificationRecipient,
             @Value("${email.user}") String user,
-            @Value("${email.password}") String password
+            @Value("${email.password}") String password,
+            @Value("${email.host}") String host,
+            @Value("${email.port}") Integer port,
+            @Value("${email.socketFactory.port}") Integer socketFactoryPort,
+            @Value("${email.socketFactory.class}") String socketFactoryClass
     ) {
-        final EmailNotificationRecipients emailNotificationRecipients = new EmailNotificationRecipients();
-        emailNotificationRecipients.getErrorRecipients().add(errorRecipient);
-        emailNotificationRecipients.getNotificationRecipients().add(notificationRecipient);
-        emailNotificationRecipients.setUser(user);
-        emailNotificationRecipients.setPassword(password);
-        return emailNotificationRecipients;
+        final EmailNotificationConfigs emailNotificationConfigs = new EmailNotificationConfigs();
+        emailNotificationConfigs.getErrorRecipients().add(errorRecipient);
+        emailNotificationConfigs.getNotificationRecipients().add(notificationRecipient);
+        emailNotificationConfigs.setUser(user);
+        emailNotificationConfigs.setPassword(password);
+        emailNotificationConfigs.setHost(host);
+        emailNotificationConfigs.setPort(port);
+        emailNotificationConfigs.setSocketFactoryPort(socketFactoryPort);
+        emailNotificationConfigs.setSocketFactoryClass(socketFactoryClass);
+        return emailNotificationConfigs;
     }
 }

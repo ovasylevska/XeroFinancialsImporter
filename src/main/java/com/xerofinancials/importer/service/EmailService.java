@@ -1,6 +1,6 @@
 package com.xerofinancials.importer.service;
 
-import com.xerofinancials.importer.beans.EmailNotificationRecipients;
+import com.xerofinancials.importer.beans.EmailNotificationConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,16 +19,16 @@ import java.util.Properties;
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
     private static final String NOTIFICATION_PREFIX = "Xero Financials Importer: ";
-    private final EmailNotificationRecipients emailNotificationRecipients;
+    private final EmailNotificationConfigs emailNotificationConfigs;
 
-    public EmailService(final EmailNotificationRecipients emailNotificationRecipients) {
-        this.emailNotificationRecipients = emailNotificationRecipients;
+    public EmailService(final EmailNotificationConfigs emailNotificationConfigs) {
+        this.emailNotificationConfigs = emailNotificationConfigs;
     }
 
     public void sendErrorEmail(String subject, String text) {
         try {
             final Session session = getSession();
-            final Message message = getMessage(session, subject, text, emailNotificationRecipients.getErrorRecipients());
+            final Message message = getMessage(session, subject, text, emailNotificationConfigs.getErrorRecipients());
             Transport.send(message);
         } catch (MessagingException e) {
             logger.error("Error while sending email", e);
@@ -38,7 +38,7 @@ public class EmailService {
     public void sendNotificationEmail(String subject, String text) {
         try {
             final Session session = getSession();
-            final Message message = getMessage(session, subject, text, emailNotificationRecipients.getNotificationRecipients());
+            final Message message = getMessage(session, subject, text, emailNotificationConfigs.getNotificationRecipients());
             Transport.send(message);
         } catch (MessagingException e) {
             logger.error("Error while sending email", e);
@@ -47,18 +47,22 @@ public class EmailService {
 
     private Session getSession() {
         final Properties properties = new Properties();
-        properties.put("mail.smtp.host", "smtp.gmail.com");
-        properties.put("mail.smtp.socketFactory.port", "465");
-        properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        properties.put("mail.smtp.host", emailNotificationConfigs.getHost());
+        properties.put("mail.smtp.port", emailNotificationConfigs.getPort());
         properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.port", "465");
+        if (emailNotificationConfigs.getSocketFactoryPort() != null) {
+            properties.put("mail.smtp.socketFactory.port", emailNotificationConfigs.getSocketFactoryPort());
+        }
+        if (emailNotificationConfigs.getSocketFactoryClass() != null) {
+            properties.put("mail.smtp.socketFactory.class", emailNotificationConfigs.getSocketFactoryClass());
+        }
 
         return Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(
-                        emailNotificationRecipients.getUser(),
-                        emailNotificationRecipients.getPassword()
+                        emailNotificationConfigs.getUser(),
+                        emailNotificationConfigs.getPassword()
                 );
             }
         });
@@ -66,7 +70,7 @@ public class EmailService {
 
     private Message getMessage(Session session, String subject, String text, List<String> recipients) throws MessagingException {
         final Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(emailNotificationRecipients.getUser()));
+        message.setFrom(new InternetAddress(emailNotificationConfigs.getUser()));
         final InternetAddress[] parsedRecipients = InternetAddress.parse(String.join(",", recipients));
         message.setRecipients(Message.RecipientType.TO, parsedRecipients);
         message.setSubject(NOTIFICATION_PREFIX + subject);
