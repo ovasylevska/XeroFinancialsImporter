@@ -21,7 +21,10 @@ public class TokenStorage {
 
     public TokenStorage(final XeroTokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
+        pull();
+    }
 
+    public void pull() {
         Optional<XeroTokens> xeroTokens = tokenRepository.get();
         if (xeroTokens.isPresent()) {
             TOKEN_STORAGE.put(JWT_TOKEN, xeroTokens.get().getJwrToken());
@@ -29,6 +32,8 @@ public class TokenStorage {
             TOKEN_STORAGE.put(REFRESH_TOKEN, xeroTokens.get().getRefreshToken());
             TOKEN_STORAGE.put(TENANT_ID, xeroTokens.get().getTenantId());
             TOKEN_STORAGE.put(EXPIRES_IN_SECONDS, xeroTokens.get().getExpiresInSeconds());
+        } else {
+            TOKEN_STORAGE.clear();
         }
     }
 

@@ -4,6 +4,8 @@ import com.xerofinancials.importer.xeroauthorization.CallbackHandler;
 import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import com.xerofinancials.importer.xeroauthorization.Authorization;
 import com.xerofinancials.importer.repository.XeroAccountCredentialsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/xero")
 public class XeroAuthorizationController {
+    private static final Logger logger = LoggerFactory.getLogger(XeroAuthorizationController.class);
     private final TokenStorage tokenStorage;
     private final Authorization authorization;
     private final CallbackHandler callbackHandler;
@@ -47,7 +50,15 @@ public class XeroAuthorizationController {
 
     @GetMapping(value = {"/redirect/", "/redirect"})
     public String redirect(@RequestParam Map<String,String> requestParams, Model model) throws IOException {
+        logger.info("Processing Xero API redirect : " + requestParams);
         callbackHandler.extractTokenInfo(requestParams);
+        return "redirect:/xero/authorization";
+    }
+
+    @GetMapping(value = {"/pull"})
+    public String refresh(@RequestParam Map<String,String> requestParams, Model model) throws IOException {
+        logger.info("Pulling tokens from database...");
+        tokenStorage.pull();
         return "redirect:/xero/authorization";
     }
 
