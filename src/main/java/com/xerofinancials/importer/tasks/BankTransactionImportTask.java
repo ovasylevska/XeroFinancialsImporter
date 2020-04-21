@@ -27,6 +27,11 @@ public abstract class BankTransactionImportTask extends ImportTask {
     protected final LineItemRepository lineItemRepository;
     protected final EmailService emailService;
 
+    private Integer bankTransactionsMaxEntityId;
+    private Integer contactsMaxEntityId;
+    private Integer bankAccountsMaxEntityId;
+    private Integer lineItemsMaxEntityId;
+
     protected BankTransactionImportTask(
             final FinancialsBankTransactionRepository bankTransactionRepository,
             final ContactRepository contactRepository,
@@ -45,6 +50,13 @@ public abstract class BankTransactionImportTask extends ImportTask {
     @Override
     public XeroDataType getDataType() {
         return XeroDataType.BANK_TRANSACTION;
+    }
+
+    protected void rememberExistingData() {
+        this.bankTransactionsMaxEntityId = bankTransactionRepository.getMaxEntityId().orElse(null);
+        this.contactsMaxEntityId = contactRepository.getMaxEntityId().orElse(null);
+        this.bankAccountsMaxEntityId = bankAccountRepository.getMaxEntityId().orElse(null);
+        this.lineItemsMaxEntityId = lineItemRepository.getMaxEntityId().orElse(null);
     }
 
     protected void saveBankTransactionData(BankTransactions data) {
@@ -82,5 +94,25 @@ public abstract class BankTransactionImportTask extends ImportTask {
                 .distinct()
                 .collect(Collectors.toList());
         lineItemRepository.save(lineItemsData);
+    }
+
+    @Override
+    void rollback() {
+        if (this.bankTransactionsMaxEntityId != null) {
+            logger.info("Rollback Bank Transaction data...");
+            bankTransactionRepository.delete(this.bankTransactionsMaxEntityId);
+        }
+        if (this.contactsMaxEntityId != null) {
+            logger.info("Rollback Contact data...");
+            contactRepository.delete(this.contactsMaxEntityId);
+        }
+        if (this.bankAccountsMaxEntityId != null) {
+            logger.info("Rollback Bank Account data...");
+            bankAccountRepository.delete(this.bankAccountsMaxEntityId);
+        }
+        if (this.lineItemsMaxEntityId != null) {
+            logger.info("Rollback Line Item data...");
+            lineItemRepository.delete(this.lineItemsMaxEntityId);
+        }
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -66,6 +67,21 @@ public class LineItemRepository {
                     })
                     .collect(Collectors.toList());
             jdbc.batchUpdate(sql, partitionData);
+        }
+    }
+
+    public void delete(int id) {
+        final String sql = "DELETE FROM line_items WHERE id > ?";
+        jdbc.update(sql, id);
+    }
+
+    public Optional<Integer> getMaxEntityId() {
+        final String sql = "SELECT MAX(id) AS max_entity_id FROM line_items";
+        final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
+        if (results.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(results.get(0));
         }
     }
 

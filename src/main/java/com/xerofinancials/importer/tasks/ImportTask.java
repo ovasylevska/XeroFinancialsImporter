@@ -41,6 +41,7 @@ public abstract class ImportTask {
         } catch (Exception e) {
             logger.error("Exception while executing task '{}'.", getName());
             logger.error(e.getMessage(), e);
+            rollback();
             emailService.sendErrorEmail(
                     "Exception while executing task",
                     "Task '" + getName() + "' is failed with error : " + e.getMessage()
@@ -61,6 +62,10 @@ public abstract class ImportTask {
                 logger.error("Validation error : " + err.getMessage());
             }
         }
+    }
+
+    void rollback() {
+
     }
 
     static class Counter {

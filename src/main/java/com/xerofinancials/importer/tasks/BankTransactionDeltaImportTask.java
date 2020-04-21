@@ -53,6 +53,7 @@ public class BankTransactionDeltaImportTask extends BankTransactionImportTask {
             if (!tokenStorage.isAuthentificated()) {
                 throw new RuntimeException("Application is not Authenticated!");
             }
+            rememberExistingData();
             processBankTransactionData();
             taskLaunchHistoryRepository.save(getDataType());
         } catch (XeroApiException e) {
