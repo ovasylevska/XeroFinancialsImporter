@@ -1,7 +1,6 @@
 package com.xerofinancials.importer.repository;
 
 public class XeroAccountCredentialsRepository {
-    //todo: move to config or database
     private final String clientId;
     private final String clientSecret;
     private final String redirectURI;

@@ -32,6 +32,7 @@ public class XeroApiWrapper {
         } catch (IOException e) {
             logger.error("Exception while executing Xero api call : " + e.getMessage());
         }
+        //todo: handle api limits
         return call.execute(accountingApi, this.accessToken, this.tenantId);
     }
 

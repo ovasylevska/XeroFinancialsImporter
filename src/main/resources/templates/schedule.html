@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Xero Financials Importer - Financials Import Tasks</title>
+    <title>Xero Financials Importer - Schedule</title>
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
@@ -32,51 +32,46 @@
     <div id="navigation"></div>
 </div>
 
+<div class="card mx-auto">
+    <div class="card-body mx-auto">
+        <form class="form-inline" method="POST" th:object="${newScheduleTime}" th:action="@{/schedule}">
+            <div class=" form-group mb-2">
+                <input type="text" readonly class="form-control-plaintext" id="description"
+                       value="New Schedule (UTC)">
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="startTimePicker" class="sr-only">Schedule Time</label>
+                <input type="time" class="form-control" id="startTimePicker"
+                       th:field="*{startTime}">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Add</button>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body" style="padding-left: 0px; padding-right: 0px;">
-
         <table class="table table-striped">
             <thead>
             <tr>
-                <th scope="col">Task</th>
+                <th scope="col">Schedule Time (UTC)</th>
                 <th scope="col">Action</th>
             </tr>
             </thead>
             <tbody>
 
-            <tr>
+            <tr th:each="time : ${scheduleTimes}">
+                <td th:text="${time.startTime}"></td>
                 <td>
-                    <label class="col-sm-8 col-form-label" for="initialImportTask">Initial Import Task</label>
-                </td>
-                <td>
-                    <a id="initialImportTask" href="/task/initial" class="btn btn-info">Run</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="initialImportTask">Delta Import Task</label>
-                </td>
-                <td>
-                    <a id="deltaImportTask" href="/task/delta" class="btn btn-info">Run</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="reconciliationImportTask">Reconciliation Import
-                        Task</label>
-                </td>
-                <td>
-                    <a id="reconciliationImportTask" href="/task/reconciliation" class="btn btn-info">Run</a>
+                    <li class="list-inline-item"><a th:href="'/schedule/delete/'+${time.id}" class="btn btn-warning">Delete</a>
                 </td>
             </tr>
 
             </tbody>
         </table>
-
     </div>
 </div>
+
 
 </body>
 </html>

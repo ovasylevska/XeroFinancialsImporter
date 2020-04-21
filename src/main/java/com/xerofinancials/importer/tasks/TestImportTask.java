@@ -1,7 +1,6 @@
 package com.xerofinancials.importer.tasks;
 
 import com.xero.api.XeroApiException;
-import com.xero.api.client.AccountingApi;
 import com.xero.models.accounting.Account;
 import com.xero.models.accounting.AccountType;
 import com.xero.models.accounting.Accounts;
@@ -9,11 +8,10 @@ import com.xero.models.accounting.BankTransaction;
 import com.xero.models.accounting.BankTransactions;
 import com.xero.models.accounting.Contact;
 import com.xero.models.accounting.Contacts;
-import com.xero.models.accounting.Element;
 import com.xero.models.accounting.Item;
 import com.xero.models.accounting.Items;
 import com.xero.models.accounting.LineItem;
-import com.xero.models.accounting.ValidationError;
+import com.xerofinancials.importer.enums.XeroDataType;
 import com.xerofinancials.importer.xeroapi.XeroApiWrapper;
 import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
@@ -23,7 +21,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class TestImportTask {
+//todo: delete
+public class TestImportTask extends ImportTask{
     private static final Logger logger = LoggerFactory.getLogger(TestImportTask.class);
     private final XeroApiWrapper xeroApiWrapper;
     private final TokenStorage tokenStorage;
@@ -36,7 +35,7 @@ public class TestImportTask {
         this.tokenStorage = tokenStorage;
     }
 
-    public void execute() throws IOException {
+    public void execute() {
         try {
             if (!tokenStorage.isAuthentificated()) {
                 throw new RuntimeException("Application is not Authenticated!");
@@ -46,7 +45,19 @@ public class TestImportTask {
         } catch (XeroApiException e) {
             logger.error("Exception while executing task", e);
             logXeroApiException(e);
+        } catch (IOException e) {
+            logger.error("Exception while executing task", e);
         }
+    }
+
+    @Override
+    public String getName() {
+        return "Add test data";
+    }
+
+    @Override
+    public XeroDataType getDataType() {
+        return XeroDataType.BANK_TRANSACTION;
     }
 
     private void addBankTransaction() throws IOException {
@@ -61,11 +72,15 @@ public class TestImportTask {
             contact.setContactID(contactUuid);
             item.setContact(contact);
 
-            LineItem lineItem = new LineItem();
-            lineItem.setDescription("Yearly Bank Account Fee");
-            lineItem.setUnitAmount(20.00f);
-            lineItem.setAccountCode("404");
-            item.setLineItems(Arrays.asList(lineItem));
+            LineItem lineItem1 = new LineItem();
+            lineItem1.setDescription("Yearly Bank Account Fee");
+            lineItem1.setUnitAmount(100.00f);
+            lineItem1.setAccountCode("404");
+            LineItem lineItem2 = new LineItem();
+            lineItem2.setDescription("GB1-White");
+            lineItem2.setUnitAmount(99.00f);
+            lineItem2.setAccountCode("404");
+            item.setLineItems(Arrays.asList(lineItem1, lineItem2));
 
             UUID accountUuid = getAccount();
             logger.info(accountUuid.toString());
@@ -102,33 +117,20 @@ public class TestImportTask {
         logger.info("Number of bank transactions : {}", readBankTransactions.getBankTransactions().size());
     }
 
-    private void logXeroApiException(XeroApiException e) {
-        logger.error("Xero Api Exception: " + e.getResponseCode());
-        for (Element item : e.getError().getElements()) {
-            for (ValidationError err : item.getValidationErrors()) {
-                logger.error("Validation error : " + err.getMessage());
-            }
-        }
-    }
-
-    private UUID addContact(
-            String accessToken,
-            String tenantId,
-            AccountingApi accountingApi
-    ) throws IOException {
+    private UUID addContact() throws IOException {
         Contact contact = new Contact();
-        contact.setName("ABC Limited");
+        contact.setName("BNZ");
 
         Contacts contacts = new Contacts();
         contacts.addContactsItem(contact);
 
-        Contacts createdContacts = xeroApiWrapper.executeApiCall((accountingApi1, accessToken1, tenantId1) -> accountingApi1.createContacts(accessToken1, tenantId1, contacts, true));
+        Contacts createdContacts = xeroApiWrapper.executeApiCall((accountingApi, accessToken, tenantId) -> accountingApi.createContacts(accessToken, tenantId, contacts, true));
         return createdContacts.getContacts().get(0).getContactID();
     }
 
     private UUID getContact() throws IOException {
         Contacts contacts = xeroApiWrapper.executeApiCall((accountingApi, accessToken, tenantId) -> accountingApi.getContacts(accessToken, tenantId, null, null, null, null, null, false));
-        return contacts.getContacts().get(0).getContactID();
+        return contacts.getContacts().get(contacts.getContacts().size() - 1).getContactID();
     }
 
     private UUID addLineItem() throws IOException {
@@ -149,9 +151,9 @@ public class TestImportTask {
 
     private UUID addAccount() throws IOException {
         Account account = new Account();
-        account.setName("Cheque Account");
+        account.setName("Cheque Account 222");
         account.setType(AccountType.BANK);
-        account.setBankAccountNumber("121-121-1234567");
+        account.setBankAccountNumber("222-222-1234567");
 
         Accounts createdAccount = xeroApiWrapper.executeApiCall((accountingApi, accessToken, tenantId) -> accountingApi.createAccount(accessToken, tenantId, account));
         return createdAccount.getAccounts().get(0).getAccountID();
