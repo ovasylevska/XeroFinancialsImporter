@@ -4,8 +4,6 @@ import com.xerofinancials.importer.beans.XeroTokens;
 import com.xerofinancials.importer.repository.XeroTokenRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -17,51 +15,77 @@ public class TokenStorage {
     public static final String EXPIRES_IN_SECONDS = "expires_in_seconds";
     private final XeroTokenRepository tokenRepository;
 
-    private final Map<String, String> TOKEN_STORAGE = new HashMap<>();
-
     public TokenStorage(final XeroTokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
-        pull();
-    }
-
-    public void pull() {
-        Optional<XeroTokens> xeroTokens = tokenRepository.get();
-        if (xeroTokens.isPresent()) {
-            TOKEN_STORAGE.put(JWT_TOKEN, xeroTokens.get().getJwrToken());
-            TOKEN_STORAGE.put(ACCESS_TOKEN, xeroTokens.get().getAccessToken());
-            TOKEN_STORAGE.put(REFRESH_TOKEN, xeroTokens.get().getRefreshToken());
-            TOKEN_STORAGE.put(TENANT_ID, xeroTokens.get().getTenantId());
-            TOKEN_STORAGE.put(EXPIRES_IN_SECONDS, xeroTokens.get().getExpiresInSeconds());
-        } else {
-            TOKEN_STORAGE.clear();
-        }
     }
 
     public boolean isAuthentificated() {
-        if (TOKEN_STORAGE.get(ACCESS_TOKEN) == null) {
+        final Optional<XeroTokens> xeroTokens = tokenRepository.get();
+        if (!xeroTokens.isPresent()) {
             return false;
         }
-        if (TOKEN_STORAGE.get(TENANT_ID) == null) {
+        if (isEmpty(xeroTokens.get().getAccessToken())) {
+            return false;
+        }
+        if (isEmpty(xeroTokens.get().getTenantId())) {
             return false;
         }
         return true;
     }
 
     public String get(String key) {
-        return TOKEN_STORAGE.get(key);
+        final Optional<XeroTokens> xeroTokens = tokenRepository.get();
+        if (!xeroTokens.isPresent()) {
+            return null;
+        }
+        if (key.equals(JWT_TOKEN)) {
+            return xeroTokens.get().getJwrToken();
+        }
+        if (key.equals(ACCESS_TOKEN)) {
+            return xeroTokens.get().getAccessToken();
+        }
+        if (key.equals(REFRESH_TOKEN)) {
+            return xeroTokens.get().getRefreshToken();
+        }
+        if (key.equals(TENANT_ID)) {
+            return xeroTokens.get().getTenantId();
+        }
+        if (key.equals(EXPIRES_IN_SECONDS)) {
+            return xeroTokens.get().getExpiresInSeconds();
+        }
+        return null;
     }
 
-    void save(String key, String value) {
-        TOKEN_STORAGE.put(key, value);
+    public Optional<XeroTokens> get() {
+        return tokenRepository.get();
     }
 
-    void dump() {
-        XeroTokens xeroTokens = new XeroTokens();
-        xeroTokens.setJwrToken(TOKEN_STORAGE.get(JWT_TOKEN));
-        xeroTokens.setAccessToken(TOKEN_STORAGE.get(ACCESS_TOKEN));
-        xeroTokens.setRefreshToken(TOKEN_STORAGE.get(REFRESH_TOKEN));
-        xeroTokens.setTenantId(TOKEN_STORAGE.get(TENANT_ID));
-        xeroTokens.setExpiresInSeconds(TOKEN_STORAGE.get(EXPIRES_IN_SECONDS));
+    public void save(String key, String value) {
+        final XeroTokens xeroTokens = tokenRepository.get().orElse(new XeroTokens());
+        if (key.equals(JWT_TOKEN)) {
+            xeroTokens.setJwrToken(value);
+        }
+        if (key.equals(ACCESS_TOKEN)) {
+            xeroTokens.setAccessToken(value);
+        }
+        if (key.equals(REFRESH_TOKEN)) {
+            xeroTokens.setRefreshToken(value);
+        }
+        if (key.equals(TENANT_ID)) {
+            xeroTokens.setTenantId(value);
+        }
+        if (key.equals(EXPIRES_IN_SECONDS)) {
+            xeroTokens.setExpiresInSeconds(value);
+        }
         tokenRepository.update(xeroTokens);
     }
+
+    public void save(XeroTokens xeroTokens) {
+        tokenRepository.update(xeroTokens);
+    }
+
+    private boolean isEmpty(String value) {
+        return value == null || value.isEmpty();
+    }
+
 }

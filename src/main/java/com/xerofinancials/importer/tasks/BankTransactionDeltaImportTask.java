@@ -57,10 +57,11 @@ public class BankTransactionDeltaImportTask extends BankTransactionImportTask {
             processBankTransactionData();
             taskLaunchHistoryRepository.save(getDataType());
         } catch (XeroApiException e) {
-            logger.error("Exception while executing task", e);
             logXeroApiException(e);
-        } catch (IOException e) {
+            throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
+        } catch (Exception e) {
             logger.error("Exception while executing task", e);
+            throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
         }
     }
 

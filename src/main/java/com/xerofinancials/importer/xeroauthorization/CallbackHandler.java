@@ -48,7 +48,6 @@ public class CallbackHandler {
         tokenStorage.save(TokenStorage.ACCESS_TOKEN, tokenResponse.getAccessToken());
         tokenStorage.save(TokenStorage.REFRESH_TOKEN, tokenResponse.getRefreshToken());
         tokenStorage.save(TokenStorage.TENANT_ID, tenantId);
-        tokenStorage.dump();
     }
 
     private String getTenantId(final TokenResponse tokenResponse) throws IOException {

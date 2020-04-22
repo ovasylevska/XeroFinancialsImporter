@@ -25,20 +25,20 @@ public class EmailService {
         this.emailNotificationConfigs = emailNotificationConfigs;
     }
 
-    public void sendErrorEmail(String subject, String text) {
+    public void sendErrorEmail(String subject, List<String> messages) {
         try {
             final Session session = getSession();
-            final Message message = getMessage(session, subject, text, emailNotificationConfigs.getErrorRecipients());
+            final Message message = getMessage(session, subject, messages, emailNotificationConfigs.getErrorRecipients());
             Transport.send(message);
         } catch (MessagingException e) {
             logger.error("Error while sending email", e);
         }
     }
 
-    public void sendNotificationEmail(String subject, String text) {
+    public void sendNotificationEmail(String subject, List<String> messages) {
         try {
             final Session session = getSession();
-            final Message message = getMessage(session, subject, text, emailNotificationConfigs.getNotificationRecipients());
+            final Message message = getMessage(session, subject, messages, emailNotificationConfigs.getNotificationRecipients());
             Transport.send(message);
         } catch (MessagingException e) {
             logger.error("Error while sending email", e);
@@ -68,13 +68,13 @@ public class EmailService {
         });
     }
 
-    private Message getMessage(Session session, String subject, String text, List<String> recipients) throws MessagingException {
+    private Message getMessage(Session session, String subject, List<String> messages, List<String> recipients) throws MessagingException {
         final Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(emailNotificationConfigs.getUser()));
         final InternetAddress[] parsedRecipients = InternetAddress.parse(String.join(",", recipients));
         message.setRecipients(Message.RecipientType.TO, parsedRecipients);
         message.setSubject(NOTIFICATION_PREFIX + subject);
-        message.setText(text);
+        message.setText(String.join("\r\n", messages));
         return message;
     }
 }

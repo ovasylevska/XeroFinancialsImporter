@@ -53,12 +53,13 @@
             </div>
         </div>
 
-        <div th:if="${redirect != null}" style="padding-left: 15px;">
+        <div th:if="${!isAuthentificated}" style="padding-left: 15px;">
             <a th:href="${redirect}" class="btn btn-info">Authorize Application</a>
         </div>
 
-        <div th:if="${redirect == null}" style="padding-left: 15px;">
+        <div th:if="${isAuthentificated}" style="padding-left: 15px;">
             <a th:href="${redirect}" class="btn btn-primary disabled">Application is Authorized</a>
+            <a th:href="${redirect}" class="btn btn-primary">Refresh</a>
         </div>
     </div>
 </div>

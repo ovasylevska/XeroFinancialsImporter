@@ -9,6 +9,10 @@ import com.xerofinancials.importer.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+
 public abstract class ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(ImportTask.class);
     protected ImportStatistics importStatistics;
@@ -31,21 +35,11 @@ public abstract class ImportTask {
             this.isRunning = true;
             execute();
             logger.info("Task '{}' is finished.", getName());
-
-            if (importStatistics != null) {
-                emailService.sendNotificationEmail(
-                        "Task execution completed",
-                        "Task '" + getName() + "' is completed. " + importStatistics.toString()
-                );
-            }
+            sendStatisticsEmail();
         } catch (Exception e) {
-            logger.error("Exception while executing task '{}'.", getName());
-            logger.error(e.getMessage(), e);
+            logger.error("Exception while executing task '{}' : ", getName(), e.getMessage());
             rollback();
-            emailService.sendErrorEmail(
-                    "Exception while executing task",
-                    "Task '" + getName() + "' is failed with error : " + e.getMessage()
-            );
+            sendErrorEmail(e);
         } finally {
             this.isRunning = false;
         }
@@ -55,8 +49,30 @@ public abstract class ImportTask {
         return isRunning;
     }
 
+    private void sendStatisticsEmail() {
+        if (importStatistics != null) {
+            emailService.sendNotificationEmail(
+                    "Task execution completed",
+                    Arrays.asList("Task '" + getName() + "' is completed. " + importStatistics.toString())
+            );
+        }
+    }
+
+    private void sendErrorEmail(Exception e) {
+        emailService.sendErrorEmail(
+                "Exception while executing task",
+                Arrays.asList(
+                        "Task '" + getName() + "' is failed with error : " + e.getMessage(),
+                        getStackTrace(e)
+                )
+        );
+    }
+
     void logXeroApiException(XeroApiException e) {
         logger.error("Xero Api Exception: " + e.getResponseCode());
+        if (e.getError() == null) {
+            return;
+        }
         for (Element item : e.getError().getElements()) {
             for (ValidationError err : item.getValidationErrors()) {
                 logger.error("Validation error : " + err.getMessage());
@@ -66,6 +82,13 @@ public abstract class ImportTask {
 
     void rollback() {
 
+    }
+
+    private String getStackTrace(Exception e) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 
     static class Counter {

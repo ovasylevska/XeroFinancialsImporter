@@ -64,7 +64,6 @@ public class TokenRefresh {
             tokenStorage.save(TokenStorage.ACCESS_TOKEN, tokenResponse.getAccessToken());
             tokenStorage.save(TokenStorage.REFRESH_TOKEN, tokenResponse.getRefreshToken());
             tokenStorage.save(TokenStorage.EXPIRES_IN_SECONDS, tokenResponse.getExpiresInSeconds().toString());
-            tokenStorage.dump();
 
             logger.info("Access token was refreshed");
             return tokenResponse.getAccessToken();
