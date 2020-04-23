@@ -5,6 +5,7 @@ import com.xero.models.accounting.Element;
 import com.xero.models.accounting.ValidationError;
 import com.xerofinancials.importer.beans.ImportStatistics;
 import com.xerofinancials.importer.enums.XeroDataType;
+import com.xerofinancials.importer.exceptions.DoNotRollbackException;
 import com.xerofinancials.importer.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.List;
 
 public abstract class ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(ImportTask.class);
@@ -36,10 +38,13 @@ public abstract class ImportTask {
             execute();
             logger.info("Task '{}' is finished.", getName());
             sendStatisticsEmail();
+        } catch (DoNotRollbackException ne) {
+            logger.error("Exception while executing task '{}' : {}", getName(), ne.getException().getMessage());
+            sendErrorEmail(ne.getException());
         } catch (Exception e) {
-            logger.error("Exception while executing task '{}' : ", getName(), e.getMessage());
+            logger.error("Exception while executing task '{}' : {}", getName(), e.getMessage());
             rollback();
-            sendErrorEmail(e);
+            sendErrorEmail(e, Arrays.asList("All new imported data will be rolled back"));
         } finally {
             this.isRunning = false;
         }
@@ -56,6 +61,15 @@ public abstract class ImportTask {
                     Arrays.asList("Task '" + getName() + "' is completed. " + importStatistics.toString())
             );
         }
+    }
+
+    private void sendErrorEmail(Exception e, List<String> errorMessages) {
+        errorMessages.add("Task '" + getName() + "' is failed with error : " + e.getMessage());
+        errorMessages.add(getStackTrace(e));
+        emailService.sendErrorEmail(
+                "Exception while executing task",
+                errorMessages
+        );
     }
 
     private void sendErrorEmail(Exception e) {

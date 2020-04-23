@@ -3,6 +3,8 @@ package com.xerofinancials.importer.tasks;
 import com.xero.api.XeroApiException;
 import com.xero.models.accounting.BankTransactions;
 import com.xerofinancials.importer.beans.ImportStatistics;
+import com.xerofinancials.importer.exceptions.DoNotRollbackException;
+import com.xerofinancials.importer.exceptions.XeroAPIRateLimitException;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
@@ -51,6 +53,12 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
             rememberExistingData();
             processBankTransactionData();
             taskLaunchHistoryRepository.save(getDataType());
+        }  catch (XeroAPIRateLimitException e) {
+            //as client does not inform how many records he has in account,
+            //lets assume that it is impossible to import all (initial) data during one day
+            //initial import can be run several days, so do not rollback data
+            logger.error("Exception while executing task", e);
+            throw new DoNotRollbackException(e);
         } catch (XeroApiException e) {
             logXeroApiException(e);
             throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
