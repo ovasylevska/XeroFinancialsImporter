@@ -3,6 +3,7 @@ CREATE TABLE bank_transactions (
 	bank_transaction_id varchar(250),
 	bank_transaction_type varchar(250),
 	contact_id varchar(250),
+	bank_account_id varchar(250),
 	line_items varchar,
 	is_reconciled int,
 	bank_transaction_date date,
@@ -19,7 +20,7 @@ CREATE TABLE bank_transactions (
 	overpayment_id varchar(250),
 	updated_date_utc bigint,
 	has_attachments int,
-	status_attribute_string varchar(250)
+	status_attribute_string varchar
 );
 
 create index bank_transaction_id_indx on bank_transactions (bank_transaction_id);

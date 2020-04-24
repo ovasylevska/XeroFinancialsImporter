@@ -33,6 +33,7 @@ public class FinancialsBankTransactionRepository {
                 "bank_transaction_id, " +
                 "bank_transaction_type, " +
                 "contact_id, " +
+                "bank_account_id, " +
                 "line_items, " +
                 "is_reconciled, " +
                 "bank_transaction_date, " +
@@ -50,7 +51,7 @@ public class FinancialsBankTransactionRepository {
                 "updated_date_utc, " +
                 "has_attachments, " +
                 "status_attribute_string " +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         for (final List<BankTransactionDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
 
@@ -60,6 +61,7 @@ public class FinancialsBankTransactionRepository {
                             t.getBankTransactionId(),
                             t.getType(),
                             t.getContactId(),
+                            t.getBankAccountId(),
                             t.getLineItems(),
                             t.getIsReconciled(),
                             t.getDate(),

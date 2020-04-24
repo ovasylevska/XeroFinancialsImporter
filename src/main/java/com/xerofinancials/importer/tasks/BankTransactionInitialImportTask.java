@@ -53,12 +53,6 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
             rememberExistingData();
             processBankTransactionData();
             taskLaunchHistoryRepository.save(getDataType());
-        }  catch (XeroAPIRateLimitException e) {
-            //as client does not inform how many records he has in account,
-            //lets assume that it is impossible to import all (initial) data during one day
-            //initial import can be run several days, so do not rollback data
-            logger.error("Exception while executing task", e);
-            throw new DoNotRollbackException(e);
         } catch (XeroApiException e) {
             logXeroApiException(e);
             throw new RuntimeException("Failed to execute '" + getName() + "' task", e);

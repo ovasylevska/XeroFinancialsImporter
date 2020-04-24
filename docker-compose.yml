@@ -5,7 +5,7 @@ services:
     volumes:
       - ./importer-database-volume:/var/lib/postgresql
     container_name: xero-financials-importer-db
-    image: postgres:11
+    image: postgres:10
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=xfi_2020
