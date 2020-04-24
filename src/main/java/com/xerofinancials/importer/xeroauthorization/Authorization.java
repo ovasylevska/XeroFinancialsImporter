@@ -7,6 +7,7 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.testing.http.FixedClock;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.xerofinancials.importer.repository.XeroAccountCredentialsRepository;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ public class Authorization {
         )
                 .setScopes(scopeList)
                 .setDataStoreFactory(new MemoryDataStoreFactory())
+                .setClock(new FixedClock())
                 .build();
 
         return flow.newAuthorizationUrl()
