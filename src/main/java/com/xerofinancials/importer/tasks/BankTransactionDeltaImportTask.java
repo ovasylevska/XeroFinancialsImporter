@@ -88,7 +88,7 @@ public class BankTransactionDeltaImportTask extends BankTransactionImportTask {
                         tenantId,
                         getModifiedSinceDate(),
                         null,
-                        null,
+                        "Date",
                         pageCount.get(),
                         UNIT_DECIMAL_PLACES
                 ));

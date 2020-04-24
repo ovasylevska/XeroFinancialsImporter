@@ -24,6 +24,9 @@ public class LineItemDto {
     private String repeatingInvoiceID;
 
     public LineItemDto (LineItem xeroLineItem, BankTransaction xeroBankTransaction) {
+        if (xeroLineItem == null) {
+            return;
+        }
         this.lineItemId = xeroLineItem.getLineItemID().toString();
         this.bankTransactionId = xeroBankTransaction.getBankTransactionID().toString();
         this.description = xeroLineItem.getDescription();

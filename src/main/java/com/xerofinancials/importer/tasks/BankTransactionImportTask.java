@@ -72,6 +72,7 @@ public abstract class BankTransactionImportTask extends ImportTask {
                 .stream()
                 .map(BankTransaction::getContact)
                 .map(ContactDto::new)
+                .filter(c -> c.getContactId() != null)
                 .distinct()
                 .collect(Collectors.toList());
         contactRepository.saveNewContacts(contactsData);
@@ -80,6 +81,7 @@ public abstract class BankTransactionImportTask extends ImportTask {
                 .stream()
                 .map(BankTransaction::getBankAccount)
                 .map(BankAccountDto::new)
+                .filter(ba -> ba.getBankAccountId() != null)
                 .distinct()
                 .collect(Collectors.toList());
         bankAccountRepository.saveNewBankAccounts(bankAccountsData);
@@ -91,6 +93,7 @@ public abstract class BankTransactionImportTask extends ImportTask {
                     b.getLineItems().forEach(l -> lineItems.add(new LineItemDto(l, b)));
                     return lineItems.stream();
                 })
+                .filter(li -> li.getLineItemId() != null)
                 .distinct()
                 .collect(Collectors.toList());
         lineItemRepository.save(lineItemsData);

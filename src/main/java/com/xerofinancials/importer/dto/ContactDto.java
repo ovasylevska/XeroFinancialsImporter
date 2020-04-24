@@ -9,8 +9,10 @@ public class ContactDto {
     private String name;
 
     public ContactDto(Contact xeroContact) {
-        this.contactId = xeroContact.getContactID().toString();
-        this.name = xeroContact.getName();
+        if (xeroContact != null) {
+            this.contactId = xeroContact.getContactID().toString();
+            this.name = xeroContact.getName();
+        }
     }
 
     public String getContactId() {

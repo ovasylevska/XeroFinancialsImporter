@@ -90,7 +90,7 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
                         tenantId,
                         null,
                         null,
-                        null,
+                        "Date",
                         pageCount.get(),
                         UNIT_DECIMAL_PLACES
                 ));

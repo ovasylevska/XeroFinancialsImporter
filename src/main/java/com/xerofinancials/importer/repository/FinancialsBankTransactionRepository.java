@@ -34,7 +34,7 @@ public class FinancialsBankTransactionRepository {
                 "bank_transaction_type, " +
                 "contact_id, " +
                 "bank_account_id, " +
-                "line_items, " +
+                "line_items, " + //todo: check if needed
                 "is_reconciled, " +
                 "bank_transaction_date, " +
                 "reference, " +

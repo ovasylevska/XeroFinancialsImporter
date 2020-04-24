@@ -10,9 +10,11 @@ public class BankAccountDto {
     private String code;
 
     public BankAccountDto(Account xeroBankAccount) {
-        this.bankAccountId = xeroBankAccount.getAccountID().toString();
-        this.name = xeroBankAccount.getName();
-        this.code = xeroBankAccount.getCode();
+        if (xeroBankAccount != null) {
+            this.bankAccountId = xeroBankAccount.getAccountID().toString();
+            this.name = xeroBankAccount.getName();
+            this.code = xeroBankAccount.getCode();
+        }
     }
 
     public String getBankAccountId() {
