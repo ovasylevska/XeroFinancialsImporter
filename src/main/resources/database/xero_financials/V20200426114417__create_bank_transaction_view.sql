@@ -43,5 +43,5 @@ SELECT
 
 FROM bank_transactions.bank_transactions bt
        INNER JOIN bank_transactions.bank_accounts ba ON ba.bank_account_id = bt.bank_account_id
-       INNER JOIN bank_transactions.contacts c ON c.contact_id = bt.contact_id
+       LEFT JOIN bank_transactions.contacts c ON c.contact_id = bt.contact_id
        INNER JOIN bank_transactions.line_items li ON li.bank_transaction_id = bt.bank_transaction_id
