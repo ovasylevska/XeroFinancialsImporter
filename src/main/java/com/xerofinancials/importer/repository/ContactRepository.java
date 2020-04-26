@@ -22,7 +22,7 @@ public class ContactRepository {
     }
 
     public void clear() {
-        final String sql = "TRUNCATE TABLE contacts";
+        final String sql = "TRUNCATE TABLE bank_transactions.contacts";
         jdbc.update(sql);
     }
 
@@ -31,7 +31,7 @@ public class ContactRepository {
             return;
         }
 
-        final String sql = "INSERT INTO contacts(contact_id, name) VALUES (?, ?)";
+        final String sql = "INSERT INTO bank_transactions.contacts(contact_id, name) VALUES (?, ?)";
 
         for (final List<ContactDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
             final Set<String> existingContactIds = getExistingContactIds(partition);
@@ -48,12 +48,12 @@ public class ContactRepository {
     }
 
     public void delete(int id) {
-        final String sql = "DELETE FROM contacts WHERE id > ?";
+        final String sql = "DELETE FROM bank_transactions.contacts WHERE id > ?";
         jdbc.update(sql, id);
     }
 
     public Optional<Integer> getMaxEntityId() {
-        final String sql = "SELECT MAX(id) AS max_entity_id FROM contacts";
+        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions.contacts";
         final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
         if (results.isEmpty()) {
             return Optional.empty();
@@ -65,7 +65,7 @@ public class ContactRepository {
     private Set<String> getExistingContactIds(List<ContactDto> data) {
         final Set<String> result = new HashSet<>();
         final String sql = "SELECT contact_id " +
-                "FROM contacts " +
+                "FROM bank_transactions.contacts " +
                 "WHERE contact_id IN ("
                 + data
                     .stream()

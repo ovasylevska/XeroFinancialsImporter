@@ -22,7 +22,7 @@ public class BankAccountRepository {
     }
 
     public void clear() {
-        final String sql = "TRUNCATE TABLE bank_accounts";
+        final String sql = "TRUNCATE TABLE bank_transactions.bank_accounts";
         jdbc.update(sql);
     }
 
@@ -31,7 +31,7 @@ public class BankAccountRepository {
             return;
         }
 
-        final String sql = "INSERT INTO bank_accounts(bank_account_id, name, code) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO bank_transactions.bank_accounts(bank_account_id, name, code) VALUES (?, ?, ?)";
 
         for (final List<BankAccountDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
             final Set<String> existingBankAccountIds = getExistingBankAccountIds(partition);
@@ -48,12 +48,12 @@ public class BankAccountRepository {
     }
 
     public void delete(int id) {
-        final String sql = "DELETE FROM bank_accounts WHERE id > ?";
+        final String sql = "DELETE FROM bank_transactions.bank_accounts WHERE id > ?";
         jdbc.update(sql, id);
     }
 
     public Optional<Integer> getMaxEntityId() {
-        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_accounts";
+        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions.bank_accounts";
         final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
         if (results.isEmpty()) {
             return Optional.empty();
@@ -65,7 +65,7 @@ public class BankAccountRepository {
     private Set<String> getExistingBankAccountIds(List<BankAccountDto> data) {
         final Set<String> result = new HashSet<>();
         final String sql = "SELECT bank_account_id " +
-                "FROM bank_accounts " +
+                "FROM bank_transactions.bank_accounts " +
                 "WHERE bank_account_id IN ("
                 + data
                 .stream()

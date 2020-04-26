@@ -20,7 +20,7 @@ public class LineItemRepository {
     }
 
     public void clear() {
-        final String sql = "TRUNCATE TABLE line_items";
+        final String sql = "TRUNCATE TABLE bank_transactions.line_items";
         jdbc.update(sql);
     }
 
@@ -29,7 +29,7 @@ public class LineItemRepository {
             return;
         }
 
-        final String sql = "INSERT INTO line_items(" +
+        final String sql = "INSERT INTO bank_transactions.line_items(" +
                 "line_item_id, " +
                 "bank_transaction_id, " +
                 "description, " +
@@ -71,12 +71,12 @@ public class LineItemRepository {
     }
 
     public void delete(int id) {
-        final String sql = "DELETE FROM line_items WHERE id > ?";
+        final String sql = "DELETE FROM bank_transactions.line_items WHERE id > ?";
         jdbc.update(sql, id);
     }
 
     public Optional<Integer> getMaxEntityId() {
-        final String sql = "SELECT MAX(id) AS max_entity_id FROM line_items";
+        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions.line_items";
         final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
         if (results.isEmpty()) {
             return Optional.empty();

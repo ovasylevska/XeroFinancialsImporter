@@ -27,6 +27,7 @@ public class DatabaseMigrationConfig {
             Flyway flyway = Flyway.configure()
                     .dataSource(financialsDataSource)
                     .locations(new Location("database/xero_financials"), new Location("database/xero_importer"))
+                    .schemas("bank_transactions")
                     .baselineOnMigrate(true)
                     .load();
             logger.info("Starting database migration for 'financials' and 'importer' data sources...");
@@ -52,6 +53,7 @@ public class DatabaseMigrationConfig {
         final Flyway flyway = Flyway.configure()
                 .dataSource(datasource)
                 .locations(new Location("database/xero_financials"))
+                .schemas("bank_transactions")
                 .baselineOnMigrate(true)
                 .load();
         logger.info("Starting database migration for 'xero_financials' database...");
@@ -63,6 +65,7 @@ public class DatabaseMigrationConfig {
         final Flyway flyway = Flyway.configure()
                 .dataSource(datasource)
                 .locations(new Location("database/xero_importer"))
+                .schemas("bank_transactions")
                 .baselineOnMigrate(true)
                 .load();
         logger.info("Starting database migration for 'xero_importer' database...");

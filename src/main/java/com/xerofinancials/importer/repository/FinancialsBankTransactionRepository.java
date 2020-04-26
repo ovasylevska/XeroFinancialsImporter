@@ -20,7 +20,7 @@ public class FinancialsBankTransactionRepository {
     }
 
     public void clear() {
-        final String sql = "TRUNCATE TABLE bank_transactions";
+        final String sql = "TRUNCATE TABLE bank_transactions.bank_transactions";
         jdbc.update(sql);
     }
 
@@ -29,12 +29,11 @@ public class FinancialsBankTransactionRepository {
             return;
         }
 
-        final String sql = "INSERT INTO bank_transactions(" +
+        final String sql = "INSERT INTO bank_transactions.bank_transactions(" +
                 "bank_transaction_id, " +
                 "bank_transaction_type, " +
                 "contact_id, " +
                 "bank_account_id, " +
-                "line_items, " + //todo: check if needed
                 "is_reconciled, " +
                 "bank_transaction_date, " +
                 "reference, " +
@@ -51,7 +50,7 @@ public class FinancialsBankTransactionRepository {
                 "updated_date_utc, " +
                 "has_attachments, " +
                 "status_attribute_string " +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         for (final List<BankTransactionDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
 
@@ -62,7 +61,6 @@ public class FinancialsBankTransactionRepository {
                             t.getType(),
                             t.getContactId(),
                             t.getBankAccountId(),
-                            t.getLineItems(),
                             t.getIsReconciled(),
                             t.getDate(),
                             t.getReference(),
@@ -87,12 +85,12 @@ public class FinancialsBankTransactionRepository {
     }
 
     public void delete(int id) {
-        final String sql = "DELETE FROM bank_transactions WHERE id > ?";
+        final String sql = "DELETE FROM bank_transactions.bank_transactions WHERE id > ?";
         jdbc.update(sql, id);
     }
 
     public Optional<Integer> getMaxEntityId() {
-        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions";
+        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions.bank_transactions";
         final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
         if (results.isEmpty()) {
             return Optional.empty();

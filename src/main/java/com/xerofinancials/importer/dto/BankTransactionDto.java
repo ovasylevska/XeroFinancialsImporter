@@ -10,7 +10,6 @@ public class BankTransactionDto {
     private String bankTransactionId;
     private String type;
     private String contactId;
-    private String lineItems;
     private String bankAccountId;
     private int isReconciled;
     private LocalDate date;
@@ -36,12 +35,6 @@ public class BankTransactionDto {
         }
         if (xeroBankTransaction.getContact() != null) {
             this.contactId = xeroBankTransaction.getContact().getContactID().toString();
-        }
-        if (xeroBankTransaction.getLineItems() != null) {
-            this.lineItems = xeroBankTransaction.getLineItems()
-                    .stream()
-                    .map(i -> i.toString())
-                    .collect(Collectors.joining(", "));
         }
         if (xeroBankTransaction.getBankAccount() != null) {
             this.bankAccountId = xeroBankTransaction.getBankAccount().getAccountID().toString();
@@ -92,10 +85,6 @@ public class BankTransactionDto {
 
     public String getContactId() {
         return contactId;
-    }
-
-    public String getLineItems() {
-        return lineItems;
     }
 
     public String getBankAccountId() {
