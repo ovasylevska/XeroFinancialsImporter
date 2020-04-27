@@ -1,10 +1,12 @@
 package com.xerofinancials.importer.dto;
 
 import com.xero.models.accounting.BankTransaction;
+import com.xerofinancials.importer.utils.DateUtils;
+import org.threeten.bp.OffsetDateTime;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class BankTransactionDto {
     private String bankTransactionId;
@@ -24,7 +26,7 @@ public class BankTransactionDto {
     private Double total;
     private String prepaymentId;
     private String overpaymentId;
-    private long updatedDateUTC;
+    private LocalDateTime updatedDateUTC;
     private int hasAttachments;
     private String statusAttributeString;
 
@@ -69,7 +71,8 @@ public class BankTransactionDto {
             this.overpaymentId = xeroBankTransaction.getOverpaymentID().toString();
         }
         if (xeroBankTransaction.getUpdatedDateUTC() != null) {
-            this.updatedDateUTC = xeroBankTransaction.getUpdatedDateUTC().toEpochSecond();
+            final OffsetDateTime updatedDateUTC = xeroBankTransaction.getUpdatedDateUTC();
+            this.updatedDateUTC = DateUtils.convertToUtc(updatedDateUTC);
         }
         this.hasAttachments = xeroBankTransaction.getHasAttachments() ? 1 : 0;
         this.statusAttributeString = xeroBankTransaction.getStatusAttributeString();
@@ -143,7 +146,7 @@ public class BankTransactionDto {
         return overpaymentId;
     }
 
-    public long getUpdatedDateUTC() {
+    public LocalDateTime getUpdatedDateUTC() {
         return updatedDateUTC;
     }
 
