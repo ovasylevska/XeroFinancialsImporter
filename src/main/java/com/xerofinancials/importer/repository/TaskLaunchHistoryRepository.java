@@ -21,17 +21,17 @@ public class TaskLaunchHistoryRepository {
 
     public void save(XeroDataType dataType) {
         clear(dataType);
-        final String sql = "INSERT INTO bank_transactions.task_launch_history(data_type, last_launch_time) VALUES (?, ?)";
+        final String sql = "INSERT INTO importer.task_launch_history(data_type, last_launch_time) VALUES (?, ?)";
         jdbc.update(sql, dataType.name(), DateUtils.getCurrentDateTimeInUtc());
     }
 
     public void clear(XeroDataType dataType) {
-        final String sql = "DELETE FROM bank_transactions.task_launch_history WHERE data_type = ?";
+        final String sql = "DELETE FROM importer.task_launch_history WHERE data_type = ?";
         jdbc.update(sql, dataType.name());
     }
 
     public Optional<LocalDateTime> get(XeroDataType dataType) {
-        final String sql = "SELECT last_launch_time FROM bank_transactions.task_launch_history WHERE data_type = ?";
+        final String sql = "SELECT last_launch_time FROM importer.task_launch_history WHERE data_type = ?";
         List<LocalDateTime> result = jdbc.query(sql, (rs, rowNum) -> {
             Timestamp lastLaunchTime = rs.getTimestamp("last_launch_time");
             return lastLaunchTime.toLocalDateTime();

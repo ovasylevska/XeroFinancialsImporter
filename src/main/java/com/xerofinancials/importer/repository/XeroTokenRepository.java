@@ -17,7 +17,7 @@ public class XeroTokenRepository {
     }
 
     public Optional<XeroTokens> get() {
-        final String sql = "SELECT * FROM bank_transactions.xero_tokens";
+        final String sql = "SELECT * FROM importer.xero_tokens";
         final List<XeroTokens> results = jdbc.query(sql, (rs, rowNum) -> {
             XeroTokens xeroTokens = new XeroTokens();
             xeroTokens.setJwrToken(rs.getString("jwt_token"));
@@ -40,12 +40,12 @@ public class XeroTokenRepository {
     }
 
     public void delete() {
-        final String sql = "DELETE FROM bank_transactions.xero_tokens";
+        final String sql = "DELETE FROM importer.xero_tokens";
         jdbc.update(sql);
     }
 
     public void save(XeroTokens xeroTokens) {
-        final String sql = "INSERT INTO bank_transactions.xero_tokens(" +
+        final String sql = "INSERT INTO importer.xero_tokens(" +
                 "jwt_token, " +
                 "access_token, " +
                 "refresh_token, " +

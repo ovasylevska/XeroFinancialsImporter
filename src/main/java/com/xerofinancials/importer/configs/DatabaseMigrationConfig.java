@@ -24,15 +24,7 @@ public class DatabaseMigrationConfig {
             @Value("${database.xero_importer.flywaymigration}") String importerAction
     ) {
         if (isEqual(financialsDataSource, importerDataSource) && financialsAction.equals(importerAction)) {
-            Flyway flyway = Flyway.configure()
-                    .dataSource(financialsDataSource)
-                    .locations(new Location("database/xero_financials"), new Location("database/xero_importer"))
-                    .schemas("bank_transactions")
-                    .baselineOnMigrate(true)
-                    .load();
-            logger.info("Starting database migration for 'financials' and 'importer' data sources...");
-            executeFlywayAction(flyway, financialsAction);
-            return flyway;
+            return initAllDatabases(financialsDataSource, financialsAction);
         } else {
             initFinancialsDatabase(financialsDataSource, financialsAction);
             return initImportersDatabase(importerDataSource, importerAction);
@@ -52,11 +44,14 @@ public class DatabaseMigrationConfig {
     private Flyway initFinancialsDatabase(DataSource datasource, String action) {
         final Flyway flyway = Flyway.configure()
                 .dataSource(datasource)
-                .locations(new Location("database/xero_financials"))
-                .schemas("bank_transactions")
+                .locations(
+                        new Location("database/bank_transaction"),
+                        new Location("database/account")
+                )
+                .schemas("bank_transactions", "accounts")
                 .baselineOnMigrate(true)
                 .load();
-        logger.info("Starting database migration for 'xero_financials' database...");
+        logger.info("Starting database migration for 'financials' (account and bank transactions) data source...");
         executeFlywayAction(flyway, action);
         return flyway;
     }
@@ -64,11 +59,27 @@ public class DatabaseMigrationConfig {
     private Flyway initImportersDatabase(DataSource datasource, String action) {
         final Flyway flyway = Flyway.configure()
                 .dataSource(datasource)
-                .locations(new Location("database/xero_importer"))
-                .schemas("bank_transactions")
+                .locations(new Location("database/importer"))
+                .schemas("importer")
                 .baselineOnMigrate(true)
                 .load();
-        logger.info("Starting database migration for 'xero_importer' database...");
+        logger.info("Starting database migration for 'importer' data source...");
+        executeFlywayAction(flyway, action);
+        return flyway;
+    }
+
+    private Flyway initAllDatabases(DataSource dataSource, String action) {
+        Flyway flyway = Flyway.configure()
+                .dataSource(dataSource)
+                .locations(
+                        new Location("database/importer"),
+                        new Location("database/bank_transaction"),
+                        new Location("database/account")
+                )
+                .schemas("importer", "bank_transactions", "accounts")
+                .baselineOnMigrate(true)
+                .load();
+        logger.info("Starting database migration for 'financials' and 'importer' data sources...");
         executeFlywayAction(flyway, action);
         return flyway;
     }

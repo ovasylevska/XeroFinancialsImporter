@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(ImportTask.class);
@@ -44,7 +45,7 @@ public abstract class ImportTask {
         } catch (Exception e) {
             logger.error("Exception while executing task '{}' : {}", getName(), e.getMessage());
             rollback();
-            sendErrorEmail(e, Arrays.asList("All new imported data will be rolled back"));
+            sendErrorEmail(e, "All new imported data will be rolled back");
         } finally {
             this.isRunning = false;
         }
@@ -63,12 +64,13 @@ public abstract class ImportTask {
         }
     }
 
-    private void sendErrorEmail(Exception e, List<String> errorMessages) {
-        errorMessages.add("Task '" + getName() + "' is failed with error : " + e.getMessage());
-        errorMessages.add(getStackTrace(e));
+    private void sendErrorEmail(Exception e, String... errorMessages) {
+        final List<String> errorMessagesList = Arrays.stream(errorMessages).collect(Collectors.toList());
+        errorMessagesList.add("Task '" + getName() + "' is failed with error : " + e.getMessage());
+        errorMessagesList.add(getStackTrace(e));
         emailService.sendErrorEmail(
                 "Exception while executing task",
-                errorMessages
+                errorMessagesList
         );
     }
 
