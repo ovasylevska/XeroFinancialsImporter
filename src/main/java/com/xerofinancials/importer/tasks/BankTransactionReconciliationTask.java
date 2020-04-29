@@ -1,5 +1,6 @@
 package com.xerofinancials.importer.tasks;
 
+import com.xero.models.accounting.BankTransactions;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
@@ -25,7 +26,8 @@ public class BankTransactionReconciliationTask extends BankTransactionImportTask
             final BankTransactionInitialImportTask initialImportTask,
             final TokenStorage tokenStorage,
             final EmailService emailService,
-            final TaskLaunchHistoryRepository taskLaunchHistoryRepository) {
+            final TaskLaunchHistoryRepository taskLaunchHistoryRepository
+    ) {
         super(
                 taskLaunchHistoryRepository,
                 tokenStorage,
@@ -61,6 +63,11 @@ public class BankTransactionReconciliationTask extends BankTransactionImportTask
         initialImportTask.run();
 
         this.importStatistics = initialImportTask.importStatistics;
+    }
+
+    @Override
+    protected BankTransactions readBankTransactionData(final Counter pageCount, final Counter resultsCount) {
+        return null;
     }
 
     @Override

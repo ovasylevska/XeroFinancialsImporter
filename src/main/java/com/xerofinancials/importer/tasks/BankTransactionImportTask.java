@@ -1,7 +1,9 @@
 package com.xerofinancials.importer.tasks;
 
+import com.xero.api.XeroApiException;
 import com.xero.models.accounting.BankTransaction;
 import com.xero.models.accounting.BankTransactions;
+import com.xerofinancials.importer.beans.ImportStatistics;
 import com.xerofinancials.importer.dto.BankAccountDto;
 import com.xerofinancials.importer.dto.BankTransactionDto;
 import com.xerofinancials.importer.dto.ContactDto;
@@ -17,19 +19,17 @@ import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class BankTransactionImportTask extends ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(BankTransactionImportTask.class);
-    private final TaskLaunchHistoryRepository taskLaunchHistoryRepository;
-    private final TokenStorage tokenStorage;
-    protected final FinancialsBankTransactionRepository bankTransactionRepository;
-    protected final ContactRepository contactRepository;
-    protected final BankAccountRepository bankAccountRepository;
-    protected final LineItemRepository lineItemRepository;
-    protected final EmailService emailService;
+    final FinancialsBankTransactionRepository bankTransactionRepository;
+    final ContactRepository contactRepository;
+    final BankAccountRepository bankAccountRepository;
+    final LineItemRepository lineItemRepository;
 
     private Integer bankTransactionsMaxEntityId;
     private Integer contactsMaxEntityId;
@@ -46,13 +46,10 @@ public abstract class BankTransactionImportTask extends ImportTask {
             final EmailService emailService
     ) {
         super(emailService, tokenStorage, taskLaunchHistoryRepository);
-        this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
-        this.tokenStorage = tokenStorage;
         this.bankTransactionRepository = bankTransactionRepository;
         this.contactRepository = contactRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.lineItemRepository = lineItemRepository;
-        this.emailService = emailService;
     }
 
     @Override
@@ -60,14 +57,42 @@ public abstract class BankTransactionImportTask extends ImportTask {
         return XeroDataType.BANK_TRANSACTION;
     }
 
-    protected void rememberExistingData() {
+    @Override
+    public void execute() {
+        try {
+            rememberExistingData();
+            processBankTransactionData();
+        } catch (XeroApiException e) {
+            logXeroApiException(e);
+            throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
+        } catch (Exception e) {
+            logger.error("Exception while executing task", e);
+            throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
+        }
+    }
+
+    protected abstract BankTransactions readBankTransactionData(final Counter pageCount, final Counter resultsCount) throws IOException;
+
+    private void processBankTransactionData() throws IOException {
+        final Counter pageCount = new Counter(1);
+        final Counter resultsCount = new Counter(Integer.MAX_VALUE);
+        final ImportStatistics importStatistics = new ImportStatistics();
+        while(resultsCount.get() > 0) {
+            final BankTransactions bankTransactionData = readBankTransactionData(pageCount, resultsCount);
+            saveBankTransactionData(bankTransactionData);
+            importStatistics.increaseNewBankTransactionsCount(bankTransactionData.getBankTransactions().size());
+        }
+        this.importStatistics = importStatistics;
+    }
+
+    private void rememberExistingData() {
         this.bankTransactionsMaxEntityId = bankTransactionRepository.getMaxEntityId().orElse(null);
         this.contactsMaxEntityId = contactRepository.getMaxEntityId().orElse(null);
         this.bankAccountsMaxEntityId = bankAccountRepository.getMaxEntityId().orElse(null);
         this.lineItemsMaxEntityId = lineItemRepository.getMaxEntityId().orElse(null);
     }
 
-    protected void saveBankTransactionData(BankTransactions data) {
+    private void saveBankTransactionData(BankTransactions data) {
         logger.info("Saving bank transaction data (size {}) ...", data.getBankTransactions().size());
 
         final List<BankTransactionDto> bankTransactionsData = data.getBankTransactions()

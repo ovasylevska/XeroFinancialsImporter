@@ -1,8 +1,6 @@
 package com.xerofinancials.importer.tasks;
 
-import com.xero.api.XeroApiException;
 import com.xero.models.accounting.BankTransactions;
-import com.xerofinancials.importer.beans.ImportStatistics;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
@@ -22,9 +20,6 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
     private static final Logger logger = LoggerFactory.getLogger(BankTransactionInitialImportTask.class);
     private static final int UNIT_DECIMAL_PLACES = 4;
     private final XeroApiWrapper xeroApiWrapper;
-    private final TokenStorage tokenStorage;
-    private final TaskLaunchHistoryRepository taskLaunchHistoryRepository;
-    private final EmailService emailService;
 
     public BankTransactionInitialImportTask(
             final XeroApiWrapper xeroApiWrapper,
@@ -34,30 +29,18 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
             final BankAccountRepository bankAccountRepository,
             final LineItemRepository lineItemRepository,
             final TaskLaunchHistoryRepository taskLaunchHistoryRepository,
-            final EmailService emailService) {
-        super(taskLaunchHistoryRepository, tokenStorage, bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
+            final EmailService emailService
+    ) {
+        super(
+                taskLaunchHistoryRepository,
+                tokenStorage,
+                bankTransactionRepository,
+                contactRepository,
+                bankAccountRepository,
+                lineItemRepository,
+                emailService
+        );
         this.xeroApiWrapper = xeroApiWrapper;
-        this.tokenStorage = tokenStorage;
-        this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
-        this.emailService = emailService;
-    }
-
-    @Override
-    public void execute() {
-        try {
-            if (!tokenStorage.isAuthentificated()) {
-                throw new RuntimeException("Application is not Authenticated!");
-            }
-            rememberExistingData();
-            processBankTransactionData();
-            taskLaunchHistoryRepository.save(getDataType());
-        } catch (XeroApiException e) {
-            logXeroApiException(e);
-            throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
-        } catch (Exception e) {
-            logger.error("Exception while executing task", e);
-            throw new RuntimeException("Failed to execute '" + getName() + "' task", e);
-        }
     }
 
     @Override
@@ -65,19 +48,7 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
         return "Initial import of Bank Transaction data";
     }
 
-    private void processBankTransactionData() throws IOException {
-        final Counter pageCount = new Counter(1);
-        final Counter resultsCount = new Counter(Integer.MAX_VALUE);
-        final ImportStatistics importStatistics = new ImportStatistics();
-        while(resultsCount.get() > 0) {
-            final BankTransactions bankTransactionData = readBankTransactionData(pageCount, resultsCount);
-            saveBankTransactionData(bankTransactionData);
-            importStatistics.increaseNewBankTransactionsCount(bankTransactionData.getBankTransactions().size());
-        }
-        this.importStatistics = importStatistics;
-    }
-
-    private BankTransactions readBankTransactionData(
+    protected BankTransactions readBankTransactionData(
             final Counter pageCount,
             final Counter resultsCount
     ) throws IOException {
