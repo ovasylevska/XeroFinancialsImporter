@@ -16,6 +16,7 @@ import java.util.List;
 @Controller
 @RequestMapping("/schedule")
 public class ScheduleController {
+    //todo: add schedule for diff tasks (account and bank transactions)
     private static final Logger logger = LoggerFactory.getLogger(ScheduleController.class);
     private final ScheduleRepository scheduleRepository;
 

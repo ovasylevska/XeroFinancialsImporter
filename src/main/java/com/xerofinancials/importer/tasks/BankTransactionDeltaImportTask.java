@@ -14,12 +14,8 @@ import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.threeten.bp.OffsetDateTime;
-import org.threeten.bp.ZoneOffset;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Component
 public class BankTransactionDeltaImportTask extends BankTransactionImportTask {
@@ -40,7 +36,7 @@ public class BankTransactionDeltaImportTask extends BankTransactionImportTask {
             final TaskLaunchHistoryRepository taskLaunchHistoryRepository,
             final EmailService emailService
     ) {
-        super(bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
+        super(taskLaunchHistoryRepository, tokenStorage, bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
         this.xeroApiWrapper = xeroApiWrapper;
         this.tokenStorage = tokenStorage;
         this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
@@ -95,24 +91,6 @@ public class BankTransactionDeltaImportTask extends BankTransactionImportTask {
         resultsCount.set(bankTransactionData.getBankTransactions().size());
         pageCount.increment();
         return bankTransactionData;
-    }
-
-    private OffsetDateTime getModifiedSinceDate() {
-        final Optional<LocalDateTime> lastLaunchTimeOptional = taskLaunchHistoryRepository.get(getDataType());
-        if (!lastLaunchTimeOptional.isPresent()) {
-            return null;
-        } else {
-            final LocalDateTime lastLaunchTime = lastLaunchTimeOptional.get();
-            final org.threeten.bp.LocalDateTime localDateTime = org.threeten.bp.LocalDateTime.of(
-                    lastLaunchTime.getYear(),
-                    lastLaunchTime.getMonthValue(),
-                    lastLaunchTime.getDayOfMonth(),
-                    lastLaunchTime.getHour(),
-                    lastLaunchTime.getMinute(),
-                    lastLaunchTime.getSecond()
-            );
-            return OffsetDateTime.of(localDateTime, ZoneOffset.UTC);
-        }
     }
 
     @Override

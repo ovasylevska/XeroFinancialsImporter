@@ -1,5 +1,8 @@
 package com.xerofinancials.importer.controllers;
 
+import com.xerofinancials.importer.tasks.AccountDeltaImportTask;
+import com.xerofinancials.importer.tasks.AccountInitialImportTask;
+import com.xerofinancials.importer.tasks.AccountReconciliationTask;
 import com.xerofinancials.importer.tasks.BankTransactionDeltaImportTask;
 import com.xerofinancials.importer.tasks.BankTransactionInitialImportTask;
 import com.xerofinancials.importer.tasks.BankTransactionReconciliationTask;
@@ -19,16 +22,26 @@ public class ImportTaskController {
     private final BankTransactionReconciliationTask reconciliationTask;
     private final BankTransactionDeltaImportTask deltaImportTask;
 
+    private final AccountInitialImportTask accountInitialImportTask;
+    private final AccountReconciliationTask accountReconciliationTask;
+    private final AccountDeltaImportTask accountDeltaImportTask;
+
     public ImportTaskController(
             final TokenStorage tokenStorage,
             final BankTransactionInitialImportTask initialImportTask,
             final BankTransactionReconciliationTask reconciliationTask,
-            final BankTransactionDeltaImportTask deltaImportTask
+            final BankTransactionDeltaImportTask deltaImportTask,
+            final AccountInitialImportTask accountInitialImportTask,
+            final AccountReconciliationTask accountReconciliationTask,
+            final AccountDeltaImportTask accountDeltaImportTask
     ) {
         this.tokenStorage = tokenStorage;
         this.initialImportTask = initialImportTask;
         this.reconciliationTask = reconciliationTask;
         this.deltaImportTask = deltaImportTask;
+        this.accountInitialImportTask = accountInitialImportTask;
+        this.accountReconciliationTask = accountReconciliationTask;
+        this.accountDeltaImportTask = accountDeltaImportTask;
     }
 
     @GetMapping("all")
@@ -63,6 +76,36 @@ public class ImportTaskController {
     public String reconciliationImportTask() {
         if (!isAnyTaskRunning()) {
             new Thread(reconciliationTask::run).start();
+        } else {
+            logger.info("Import Task already running. Skipping.");
+        }
+        return "redirect:/task/all";
+    }
+
+    @GetMapping("initialAccount")
+    public String initialAccountImportTask() {
+        if (!isAnyTaskRunning()) {
+            new Thread(accountInitialImportTask::run).start();
+        } else {
+            logger.info("Import Task already running. Skipping.");
+        }
+        return "redirect:/task/all";
+    }
+
+    @GetMapping("deltaAccount")
+    public String deltaAccountImportTask() {
+        if (!isAnyTaskRunning()) {
+            new Thread(accountDeltaImportTask::run).start();
+        } else {
+            logger.info("Import Task already running. Skipping.");
+        }
+        return "redirect:/task/all";
+    }
+
+    @GetMapping("reconciliationAccount")
+    public String reconciliationAccountImportTask() {
+        if (!isAnyTaskRunning()) {
+            new Thread(accountReconciliationTask::run).start();
         } else {
             logger.info("Import Task already running. Skipping.");
         }

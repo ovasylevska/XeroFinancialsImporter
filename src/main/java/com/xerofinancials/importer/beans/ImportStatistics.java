@@ -2,6 +2,7 @@ package com.xerofinancials.importer.beans;
 
 public class ImportStatistics {
     private int newBankTransactionsCount;
+    private int newAccountsCount;
 
     public int getNewBankTransactionsCount() {
         return newBankTransactionsCount;
@@ -11,8 +12,15 @@ public class ImportStatistics {
         this.newBankTransactionsCount += newBankTransactionsCount;
     }
 
+    public void increaseNewAccountsCount(final int newAccountsCount) {
+        this.newAccountsCount += newAccountsCount;
+    }
+
     @Override
     public String toString() {
-        return "Import Statistics : Bank Transactions count = " + newBankTransactionsCount + "";
+        return "ImportStatistics : {" +
+                "Bank Transactions Count=" + newBankTransactionsCount +
+                ", Accounts Count=" + newAccountsCount +
+                '}';
     }
 }

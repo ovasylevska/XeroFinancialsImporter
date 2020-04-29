@@ -4,6 +4,7 @@ import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
 import com.xerofinancials.importer.repository.LineItemRepository;
+import com.xerofinancials.importer.repository.TaskLaunchHistoryRepository;
 import com.xerofinancials.importer.service.EmailService;
 import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
@@ -15,7 +16,6 @@ public class BankTransactionReconciliationTask extends BankTransactionImportTask
     private static final Logger logger = LoggerFactory.getLogger(BankTransactionReconciliationTask.class);
     private final BankTransactionInitialImportTask initialImportTask;
     private final TokenStorage tokenStorage;
-    private final EmailService emailService;
 
     public BankTransactionReconciliationTask(
             final FinancialsBankTransactionRepository bankTransactionRepository,
@@ -24,12 +24,19 @@ public class BankTransactionReconciliationTask extends BankTransactionImportTask
             final LineItemRepository lineItemRepository,
             final BankTransactionInitialImportTask initialImportTask,
             final TokenStorage tokenStorage,
-            final EmailService emailService
-    ) {
-        super(bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
+            final EmailService emailService,
+            final TaskLaunchHistoryRepository taskLaunchHistoryRepository) {
+        super(
+                taskLaunchHistoryRepository,
+                tokenStorage,
+                bankTransactionRepository,
+                contactRepository,
+                bankAccountRepository,
+                lineItemRepository,
+                emailService
+        );
         this.initialImportTask = initialImportTask;
         this.tokenStorage = tokenStorage;
-        this.emailService = emailService;
     }
 
     @Override

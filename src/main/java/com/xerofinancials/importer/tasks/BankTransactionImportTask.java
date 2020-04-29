@@ -11,7 +11,9 @@ import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
 import com.xerofinancials.importer.repository.LineItemRepository;
+import com.xerofinancials.importer.repository.TaskLaunchHistoryRepository;
 import com.xerofinancials.importer.service.EmailService;
+import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 
 public abstract class BankTransactionImportTask extends ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(BankTransactionImportTask.class);
+    private final TaskLaunchHistoryRepository taskLaunchHistoryRepository;
+    private final TokenStorage tokenStorage;
     protected final FinancialsBankTransactionRepository bankTransactionRepository;
     protected final ContactRepository contactRepository;
     protected final BankAccountRepository bankAccountRepository;
@@ -33,13 +37,17 @@ public abstract class BankTransactionImportTask extends ImportTask {
     private Integer lineItemsMaxEntityId;
 
     protected BankTransactionImportTask(
+            final TaskLaunchHistoryRepository taskLaunchHistoryRepository,
+            final TokenStorage tokenStorage,
             final FinancialsBankTransactionRepository bankTransactionRepository,
             final ContactRepository contactRepository,
             final BankAccountRepository bankAccountRepository,
             final LineItemRepository lineItemRepository,
             final EmailService emailService
     ) {
-        super(emailService);
+        super(emailService, tokenStorage, taskLaunchHistoryRepository);
+        this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
+        this.tokenStorage = tokenStorage;
         this.bankTransactionRepository = bankTransactionRepository;
         this.contactRepository = contactRepository;
         this.bankAccountRepository = bankAccountRepository;

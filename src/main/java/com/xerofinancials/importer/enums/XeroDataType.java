@@ -1,5 +1,5 @@
 package com.xerofinancials.importer.enums;
 
 public enum XeroDataType {
-    BANK_TRANSACTION
+    BANK_TRANSACTION, ACCOUNT
 }

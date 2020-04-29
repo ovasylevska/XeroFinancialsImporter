@@ -6,24 +6,39 @@ import com.xero.models.accounting.ValidationError;
 import com.xerofinancials.importer.beans.ImportStatistics;
 import com.xerofinancials.importer.enums.XeroDataType;
 import com.xerofinancials.importer.exceptions.DoNotRollbackException;
+import com.xerofinancials.importer.repository.TaskLaunchHistoryRepository;
 import com.xerofinancials.importer.service.EmailService;
+import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.threeten.bp.OffsetDateTime;
+import org.threeten.bp.ZoneOffset;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public abstract class ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(ImportTask.class);
-    protected ImportStatistics importStatistics;
     private final EmailService emailService;
+    private final TokenStorage tokenStorage;
+    private final TaskLaunchHistoryRepository taskLaunchHistoryRepository;
     private boolean isRunning = false;
+    ImportStatistics importStatistics;
 
-    protected ImportTask(final EmailService emailService) {
+    protected ImportTask(
+            final EmailService emailService,
+            final TokenStorage tokenStorage,
+            final TaskLaunchHistoryRepository taskLaunchHistoryRepository
+    ) {
         this.emailService = emailService;
+        this.tokenStorage = tokenStorage;
+        this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
     }
 
     protected abstract void execute();
@@ -32,12 +47,18 @@ public abstract class ImportTask {
 
     public abstract XeroDataType getDataType();
 
+    public boolean getIsRunning() {
+        return isRunning;
+    }
+
     public void run() {
         try {
-            logger.info("Starting '{}' task ...", getName());
+            logger.info("Starting task '{}' ...", getName());
             this.isRunning = true;
+            validateIfAuthentificated();
             execute();
             logger.info("Task '{}' is finished.", getName());
+            taskLaunchHistoryRepository.save(getDataType());
             sendStatisticsEmail();
         } catch (DoNotRollbackException ne) {
             logger.error("Exception while executing task '{}' : {}", getName(), ne.getException().getMessage());
@@ -51,15 +72,52 @@ public abstract class ImportTask {
         }
     }
 
-    public boolean getIsRunning() {
-        return isRunning;
+    OffsetDateTime getModifiedSinceDate() {
+        final Optional<LocalDateTime> lastLaunchTimeOptional = taskLaunchHistoryRepository.get(getDataType());
+        if (!lastLaunchTimeOptional.isPresent()) {
+            return null;
+        } else {
+            final LocalDateTime lastLaunchTime = lastLaunchTimeOptional.get();
+            final org.threeten.bp.LocalDateTime localDateTime = org.threeten.bp.LocalDateTime.of(
+                    lastLaunchTime.getYear(),
+                    lastLaunchTime.getMonthValue(),
+                    lastLaunchTime.getDayOfMonth(),
+                    lastLaunchTime.getHour(),
+                    lastLaunchTime.getMinute(),
+                    lastLaunchTime.getSecond()
+            );
+            return OffsetDateTime.of(localDateTime, ZoneOffset.UTC);
+        }
+    }
+
+    //todo: add rollback with temp tables
+    void rollback() {
+
+    }
+
+    void logXeroApiException(XeroApiException e) {
+        logger.error("Xero Api Exception: " + e.getResponseCode());
+        if (e.getError() == null) {
+            return;
+        }
+        for (Element item : e.getError().getElements()) {
+            for (ValidationError err : item.getValidationErrors()) {
+                logger.error("Validation error : " + err.getMessage());
+            }
+        }
+    }
+
+    private void validateIfAuthentificated() {
+        if (!tokenStorage.isAuthentificated()) {
+            throw new RuntimeException("Application is not Authenticated!");
+        }
     }
 
     private void sendStatisticsEmail() {
         if (importStatistics != null) {
             emailService.sendNotificationEmail(
                     "Task execution completed",
-                    Arrays.asList("Task '" + getName() + "' is completed. " + importStatistics.toString())
+                    Collections.singletonList("Task '" + getName() + "' is completed. " + importStatistics.toString())
             );
         }
     }
@@ -82,22 +140,6 @@ public abstract class ImportTask {
                         getStackTrace(e)
                 )
         );
-    }
-
-    void logXeroApiException(XeroApiException e) {
-        logger.error("Xero Api Exception: " + e.getResponseCode());
-        if (e.getError() == null) {
-            return;
-        }
-        for (Element item : e.getError().getElements()) {
-            for (ValidationError err : item.getValidationErrors()) {
-                logger.error("Validation error : " + err.getMessage());
-            }
-        }
-    }
-
-    void rollback() {
-
     }
 
     private String getStackTrace(Exception e) {

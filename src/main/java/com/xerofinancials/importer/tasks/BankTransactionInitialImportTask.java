@@ -3,8 +3,6 @@ package com.xerofinancials.importer.tasks;
 import com.xero.api.XeroApiException;
 import com.xero.models.accounting.BankTransactions;
 import com.xerofinancials.importer.beans.ImportStatistics;
-import com.xerofinancials.importer.exceptions.DoNotRollbackException;
-import com.xerofinancials.importer.exceptions.XeroAPIRateLimitException;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
 import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
@@ -37,7 +35,7 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
             final LineItemRepository lineItemRepository,
             final TaskLaunchHistoryRepository taskLaunchHistoryRepository,
             final EmailService emailService) {
-        super(bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
+        super(taskLaunchHistoryRepository, tokenStorage, bankTransactionRepository, contactRepository, bankAccountRepository, lineItemRepository, emailService);
         this.xeroApiWrapper = xeroApiWrapper;
         this.tokenStorage = tokenStorage;
         this.taskLaunchHistoryRepository = taskLaunchHistoryRepository;
