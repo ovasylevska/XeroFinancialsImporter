@@ -8,12 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
-public class BankAccountRepository {
+public class BankAccountRepository extends RollbackSupportRepository {
     private static final int BATCH_SIZE = 1000;
     private final JdbcTemplate jdbc;
 
@@ -21,9 +20,19 @@ public class BankAccountRepository {
         this.jdbc = jdbc;
     }
 
-    public void clear() {
-        final String sql = "TRUNCATE TABLE bank_transactions.bank_accounts";
-        jdbc.update(sql);
+    @Override
+    public JdbcTemplate getJdbc() {
+        return this.jdbc;
+    }
+
+    @Override
+    public String getSchema() {
+        return "bank_transactions";
+    }
+
+    @Override
+    public String getTable() {
+        return "bank_accounts";
     }
 
     public void saveNewBankAccounts(List<BankAccountDto> data) {
@@ -44,21 +53,6 @@ public class BankAccountRepository {
                     .map(b -> new Object[]{b.getBankAccountId(), b.getName(), b.getCode()})
                     .collect(Collectors.toList());
             jdbc.batchUpdate(sql, partitionData);
-        }
-    }
-
-    public void delete(int id) {
-        final String sql = "DELETE FROM bank_transactions.bank_accounts WHERE id > ?";
-        jdbc.update(sql, id);
-    }
-
-    public Optional<Integer> getMaxEntityId() {
-        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions.bank_accounts";
-        final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
-        if (results.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(results.get(0));
         }
     }
 

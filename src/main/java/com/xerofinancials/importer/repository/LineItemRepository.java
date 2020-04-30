@@ -7,11 +7,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class LineItemRepository {
+public class LineItemRepository extends RollbackSupportRepository {
     private static final int BATCH_SIZE = 1000;
     private final JdbcTemplate jdbc;
 
@@ -19,9 +18,19 @@ public class LineItemRepository {
         this.jdbc = jdbc;
     }
 
-    public void clear() {
-        final String sql = "TRUNCATE TABLE bank_transactions.line_items";
-        jdbc.update(sql);
+    @Override
+    public JdbcTemplate getJdbc() {
+        return this.jdbc;
+    }
+
+    @Override
+    public String getSchema() {
+        return "bank_transactions";
+    }
+
+    @Override
+    public String getTable() {
+        return "line_items";
     }
 
     public void save(List<LineItemDto> data) {
@@ -67,21 +76,6 @@ public class LineItemRepository {
                     })
                     .collect(Collectors.toList());
             jdbc.batchUpdate(sql, partitionData);
-        }
-    }
-
-    public void delete(int id) {
-        final String sql = "DELETE FROM bank_transactions.line_items WHERE id > ?";
-        jdbc.update(sql, id);
-    }
-
-    public Optional<Integer> getMaxEntityId() {
-        final String sql = "SELECT MAX(id) AS max_entity_id FROM bank_transactions.line_items";
-        final List<Integer> results = jdbc.query(sql, (rs, rowNum) -> rs.getInt("max_entity_id"));
-        if (results.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(results.get(0));
         }
     }
 
