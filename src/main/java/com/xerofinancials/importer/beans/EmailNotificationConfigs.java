@@ -12,6 +12,7 @@ public class EmailNotificationConfigs {
     private Integer port;
     private String socketFactoryClass;
     private Integer socketFactoryPort;
+    private String serverName;
 
     public List<String> getErrorRecipients() {
         return errorRecipients;
@@ -76,5 +77,13 @@ public class EmailNotificationConfigs {
 
     public void setSocketFactoryPort(final Integer socketFactoryPort) {
         this.socketFactoryPort = socketFactoryPort;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(final String serverName) {
+        this.serverName = serverName;
     }
 }

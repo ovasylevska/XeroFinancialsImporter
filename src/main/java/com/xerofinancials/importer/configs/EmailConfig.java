@@ -17,7 +17,8 @@ public class EmailConfig {
             @Value("${email.host}") String host,
             @Value("${email.port}") Integer port,
             @Value("${email.socketFactory.port}") Integer socketFactoryPort,
-            @Value("${email.socketFactory.class}") String socketFactoryClass
+            @Value("${email.socketFactory.class}") String socketFactoryClass,
+            @Value("${spring.application.server}") String applicationServer
     ) {
         final EmailNotificationConfigs emailNotificationConfigs = new EmailNotificationConfigs();
         emailNotificationConfigs.getErrorRecipients().add(errorRecipient);
@@ -28,6 +29,7 @@ public class EmailConfig {
         emailNotificationConfigs.setPort(port);
         emailNotificationConfigs.setSocketFactoryPort(socketFactoryPort);
         emailNotificationConfigs.setSocketFactoryClass(socketFactoryClass);
+        emailNotificationConfigs.setServerName(applicationServer);
         return emailNotificationConfigs;
     }
 }

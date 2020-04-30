@@ -45,63 +45,14 @@
             </thead>
             <tbody>
 
-            <tr>
+            <tr th:each="taskIdentifier : ${taskIdentifiers}">
                 <td>
-                    <label class="col-sm-8 col-form-label" for="initialImportTask">Initial Import Task</label>
+                    <label class="col-sm-8 col-form-label" th:text="${taskIdentifier.description}"></label>
                 </td>
                 <td>
-                    <a id="initialImportTask" href="/task/initial" class="btn btn-info" name="runTask">Run</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="initialImportTask">Delta Import Task</label>
-                </td>
-                <td>
-                    <a id="deltaImportTask" href="/task/delta" class="btn btn-info" name="runTask">Run</a>
+                    <a th:href="'/task/run/' + ${taskIdentifier.identifier}" class="btn btn-info" name="runTask">Run</a>
                 </td>
             </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="reconciliationImportTask">Reconciliation Import
-                        Task</label>
-                </td>
-                <td>
-                    <a id="reconciliationImportTask" href="/task/reconciliation" class="btn btn-info" name="runTask">Run</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="initialAccountImportTask">Initial Account Import Task</label>
-                </td>
-                <td>
-                    <a id="initialAccountImportTask" href="/task/initialAccount" class="btn btn-info" name="runTask">Run</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="deltaAccountImportTask">Delta Account Import Task</label>
-                </td>
-                <td>
-                    <a id="deltaAccountImportTask" href="/task/deltaAccount" class="btn btn-info" name="runTask">Run</a>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <label class="col-sm-8 col-form-label" for="reconciliationAccountImportTask">Reconciliation Import
-                        Task</label>
-                </td>
-                <td>
-                    <a id="reconciliationAccountImportTask" href="/task/reconciliationAccount" class="btn btn-info" name="runTask">Run</a>
-                </td>
-            </tr>
-
-
 
             </tbody>
         </table>

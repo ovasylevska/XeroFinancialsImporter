@@ -73,7 +73,6 @@ public class TokenRefresh {
             } else {
                 logger.error("Exception while refreshing access token", e);
             }
-            //todo: throw new custom exception
             throw new RuntimeException("Failed to refresh access token", e);
         }
     }

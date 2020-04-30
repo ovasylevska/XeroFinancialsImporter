@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+//todo: refactor bank transaction repositories
 @Repository
 public abstract class RollbackSupportRepository {
 

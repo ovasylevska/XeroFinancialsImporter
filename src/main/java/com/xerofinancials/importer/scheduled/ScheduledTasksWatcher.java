@@ -36,11 +36,26 @@ public class ScheduledTasksWatcher {
             try {
                 final Optional<ScheduleTime> scheduledTime = getScheduledTime(CHECK_INTERVAl);
                 if (scheduledTime.isPresent()) {
-                    final TasksRepository.ImportTaskDescription task = tasksRepository.get(TasksRepository.ImportTaskIdentifier.valueOf(scheduledTime.get().getTaskIdentifier()));
+                    final String taskIdentifier = scheduledTime.get().getTaskIdentifier();
+                    final TasksRepository.ImportTaskDescription task = tasksRepository.get(TasksRepository.ImportTaskIdentifier.valueOf(taskIdentifier));
                     if (task == null) {
-                        return;
+                        logger.info(
+                                "Invalid task identifier '{}'. Skipping running task for schedule '{}'.",
+                                taskIdentifier,
+                                scheduledTime.get().getStartTime()
+                        );
+                        continue;
                     }
-                    logger.info("Scheduling task '{}' ...", task.getImportTask().getName());
+                    if (tasksRepository.isAnyTaskRunning(task.getImportTask().getDataType())) {
+                        logger.info(
+                                "Task with same data type '{}' is already running. Skipping running task '{}' for schedule '{}'.",
+                                task.getImportTask().getDataType().name(),
+                                task.getImportTask().getName(),
+                                scheduledTime.get().getStartTime()
+                        );
+                        continue;
+                    }
+                    logger.info("Running scheduled task '{}' ...", task.getImportTask().getName());
                     task.getImportTask().run();
                 }
             } catch (Exception e) {

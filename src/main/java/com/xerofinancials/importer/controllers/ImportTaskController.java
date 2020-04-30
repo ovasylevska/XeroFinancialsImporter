@@ -1,129 +1,56 @@
 package com.xerofinancials.importer.controllers;
 
-import com.xerofinancials.importer.tasks.AccountDeltaImportTask;
-import com.xerofinancials.importer.tasks.AccountInitialImportTask;
-import com.xerofinancials.importer.tasks.AccountReconciliationTask;
-import com.xerofinancials.importer.tasks.BankTransactionDeltaImportTask;
-import com.xerofinancials.importer.tasks.BankTransactionInitialImportTask;
-import com.xerofinancials.importer.tasks.BankTransactionReconciliationTask;
+import com.xerofinancials.importer.repository.TasksRepository;
 import com.xerofinancials.importer.xeroauthorization.TokenStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.Collection;
 
 @Controller
 @RequestMapping("/task")
 public class ImportTaskController {
     private static final Logger logger = LoggerFactory.getLogger(ImportTaskController.class);
     private final TokenStorage tokenStorage;
-    private final BankTransactionInitialImportTask initialImportTask;
-    private final BankTransactionReconciliationTask reconciliationTask;
-    private final BankTransactionDeltaImportTask deltaImportTask;
-
-    private final AccountInitialImportTask accountInitialImportTask;
-    private final AccountReconciliationTask accountReconciliationTask;
-    private final AccountDeltaImportTask accountDeltaImportTask;
+    private final TasksRepository tasksRepository;
 
     public ImportTaskController(
             final TokenStorage tokenStorage,
-            final BankTransactionInitialImportTask initialImportTask,
-            final BankTransactionReconciliationTask reconciliationTask,
-            final BankTransactionDeltaImportTask deltaImportTask,
-            final AccountInitialImportTask accountInitialImportTask,
-            final AccountReconciliationTask accountReconciliationTask,
-            final AccountDeltaImportTask accountDeltaImportTask
+            final TasksRepository tasksRepository
     ) {
         this.tokenStorage = tokenStorage;
-        this.initialImportTask = initialImportTask;
-        this.reconciliationTask = reconciliationTask;
-        this.deltaImportTask = deltaImportTask;
-        this.accountInitialImportTask = accountInitialImportTask;
-        this.accountReconciliationTask = accountReconciliationTask;
-        this.accountDeltaImportTask = accountDeltaImportTask;
+        this.tasksRepository = tasksRepository;
     }
 
     @GetMapping("all")
-    public String all() {
+    public String all(Model model) {
         if (!tokenStorage.isAuthentificated()) {
             return "redirect:/xero/authorization";
         }
+        final Collection<TasksRepository.ImportTaskDescription> taskDescriptions = tasksRepository.getTaskDescriptions();
+        model.addAttribute("taskIdentifiers", taskDescriptions);
         return "tasks.html";
     }
 
-    @GetMapping("initial")
-    public String initialImportTask() {
-        if (!isAnyTaskRunning()) {
-            new Thread(initialImportTask::run).start();
-        } else {
+    @GetMapping("run/{taskIdentifier}")
+    public String runTask(@PathVariable("taskIdentifier") String taskIdentifier) {
+        final TasksRepository.ImportTaskIdentifier importTaskIdentifier = TasksRepository.ImportTaskIdentifier.fromValue(taskIdentifier);
+        if (importTaskIdentifier == null) {
+            logger.info("Invalid task identifier '{}'. Skipping.", taskIdentifier);
+            return "redirect:/task/all";
+        }
+        if (tasksRepository.isAnyTaskRunning()) {
             logger.info("Import Task already running. Skipping.");
+            return "redirect:/task/all";
         }
+        final TasksRepository.ImportTaskDescription importTaskDescription = tasksRepository.get(importTaskIdentifier);
+        new Thread(() -> importTaskDescription.getImportTask().run()).start();
         return "redirect:/task/all";
-    }
-
-    @GetMapping("delta")
-    public String deltaImportTask() {
-        if (!isAnyTaskRunning()) {
-            new Thread(deltaImportTask::run).start();
-        } else {
-            logger.info("Import Task already running. Skipping.");
-        }
-        return "redirect:/task/all";
-    }
-
-    @GetMapping("reconciliation")
-    public String reconciliationImportTask() {
-        if (!isAnyTaskRunning()) {
-            new Thread(reconciliationTask::run).start();
-        } else {
-            logger.info("Import Task already running. Skipping.");
-        }
-        return "redirect:/task/all";
-    }
-
-    @GetMapping("initialAccount")
-    public String initialAccountImportTask() {
-        if (!isAnyTaskRunning()) {
-            new Thread(accountInitialImportTask::run).start();
-        } else {
-            logger.info("Import Task already running. Skipping.");
-        }
-        return "redirect:/task/all";
-    }
-
-    @GetMapping("deltaAccount")
-    public String deltaAccountImportTask() {
-        if (!isAnyTaskRunning()) {
-            new Thread(accountDeltaImportTask::run).start();
-        } else {
-            logger.info("Import Task already running. Skipping.");
-        }
-        return "redirect:/task/all";
-    }
-
-    @GetMapping("reconciliationAccount")
-    public String reconciliationAccountImportTask() {
-        if (!isAnyTaskRunning()) {
-            new Thread(accountReconciliationTask::run).start();
-        } else {
-            logger.info("Import Task already running. Skipping.");
-        }
-        return "redirect:/task/all";
-    }
-
-    //todo: move to some kind of task repository
-    private boolean isAnyTaskRunning() {
-        if (initialImportTask.getIsRunning()) {
-            return true;
-        }
-        if (reconciliationTask.getIsRunning()) {
-            return true;
-        }
-        if (deltaImportTask.getIsRunning()) {
-            return true;
-        }
-        return false;
     }
 
 }

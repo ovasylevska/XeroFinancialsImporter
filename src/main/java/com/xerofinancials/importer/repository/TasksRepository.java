@@ -1,5 +1,6 @@
 package com.xerofinancials.importer.repository;
 
+import com.xerofinancials.importer.enums.XeroDataType;
 import com.xerofinancials.importer.tasks.AccountDeltaImportTask;
 import com.xerofinancials.importer.tasks.AccountInitialImportTask;
 import com.xerofinancials.importer.tasks.AccountReconciliationTask;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -83,6 +85,26 @@ public class TasksRepository {
 
     public ImportTaskDescription get(ImportTaskIdentifier identifier) {
         return TASKS.get(identifier);
+    }
+
+    public boolean isAnyTaskRunning() {
+        return TASKS.values()
+                .stream()
+                .anyMatch(task -> task.getImportTask().getIsRunning());
+    }
+
+    public boolean isTaskRunning(ImportTaskIdentifier identifier) {
+        return TASKS.values()
+                .stream()
+                .filter(t -> t.getIdentifier() == identifier)
+                .anyMatch(task -> task.getImportTask().getIsRunning());
+    }
+
+    public boolean isAnyTaskRunning(XeroDataType dataType) {
+        return TASKS.values()
+                .stream()
+                .filter(t -> t.getImportTask().getDataType() == dataType)
+                .anyMatch(task -> task.getImportTask().getIsRunning());
     }
 
     public enum ImportTaskIdentifier {

@@ -18,11 +18,13 @@ import java.util.Properties;
 @Service
 public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
-    private static final String NOTIFICATION_PREFIX = "Xero Financials Importer: ";
+    private static final String NOTIFICATION_PREFIX = "Xero Financials Importer (${serverName}) : ";
     private final EmailNotificationConfigs emailNotificationConfigs;
+    private final String subjectPrefix;
 
     public EmailService(final EmailNotificationConfigs emailNotificationConfigs) {
         this.emailNotificationConfigs = emailNotificationConfigs;
+        this.subjectPrefix = getSubjectFromNotificationPrefix();
     }
 
     public void sendErrorEmail(String subject, List<String> messages) {
@@ -73,8 +75,13 @@ public class EmailService {
         message.setFrom(new InternetAddress(emailNotificationConfigs.getUser()));
         final InternetAddress[] parsedRecipients = InternetAddress.parse(String.join(",", recipients));
         message.setRecipients(Message.RecipientType.TO, parsedRecipients);
-        message.setSubject(NOTIFICATION_PREFIX + subject);
+        message.setSubject(subjectPrefix + subject);
         message.setText(String.join("\r\n", messages));
         return message;
+    }
+
+    private String getSubjectFromNotificationPrefix() {
+        final String serverName = emailNotificationConfigs.getServerName();
+        return NOTIFICATION_PREFIX.replace("${serverName}", serverName != null && !serverName.isEmpty() ? serverName : "Unknown Server");
     }
 }

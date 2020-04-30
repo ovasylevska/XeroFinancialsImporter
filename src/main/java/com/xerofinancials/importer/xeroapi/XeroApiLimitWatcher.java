@@ -19,6 +19,7 @@ public class XeroApiLimitWatcher {
     private int lastCurrentMinute = 0;
     private int lastCurrentDay = 0;
 
+    //todo: save to database limits/rates
     public void watch() {
         final Counter callsDuringCurrentMinute = trackMinuteWindow();
         final Counter callsDuringCurrentDay = trackDayWindow();
