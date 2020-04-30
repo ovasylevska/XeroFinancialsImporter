@@ -20,7 +20,7 @@ public class ScheduleRepository {
     }
 
     public Optional<ScheduleTime> get(Integer id) {
-        final String sql = "SELECT id, start_time " +
+        final String sql = "SELECT id, start_time, task_identifier " +
                 "FROM importer.schedule " +
                 "WHERE id = ?";
         final List<ScheduleTime> result = jdbc.query(sql, (rs, rowNum) -> getScheduleTime(rs), id);
@@ -32,7 +32,7 @@ public class ScheduleRepository {
     }
 
     public List<ScheduleTime> all() {
-        final String sql = "SELECT id, start_time FROM importer.schedule";
+        final String sql = "SELECT id, start_time, task_identifier FROM importer.schedule";
         return jdbc.query(sql, (rs, rowNum) -> getScheduleTime(rs));
     }
 
@@ -42,8 +42,8 @@ public class ScheduleRepository {
     }
 
     public void save(ScheduleTime scheduleTime) {
-        final String sql = "INSERT INTO importer.schedule(start_time) VALUES (?)";
-        jdbc.update(sql, scheduleTime.getStartTime());
+        final String sql = "INSERT INTO importer.schedule(start_time, task_identifier) VALUES (?, ?)";
+        jdbc.update(sql, scheduleTime.getStartTime(), scheduleTime.getTaskIdentifier());
     }
 
     private ScheduleTime getScheduleTime(final ResultSet rs) throws SQLException {
@@ -53,6 +53,7 @@ public class ScheduleRepository {
         if (startTime != null) {
             scheduleTime.setStartTime(startTime.toLocalTime());
         }
+        scheduleTime.setTaskIdentifier(rs.getString("task_identifier"));
         return scheduleTime;
     }
 

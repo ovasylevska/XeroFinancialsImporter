@@ -2,7 +2,7 @@ package com.xerofinancials.importer.scheduled;
 
 import com.xerofinancials.importer.beans.ScheduleTime;
 import com.xerofinancials.importer.repository.ScheduleRepository;
-import com.xerofinancials.importer.tasks.BankTransactionDeltaImportTask;
+import com.xerofinancials.importer.repository.TasksRepository;
 import com.xerofinancials.importer.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +16,14 @@ public class ScheduledTasksWatcher {
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasksWatcher.class);
     private static final int CHECK_INTERVAl = 60;
     private final ScheduleRepository scheduleRepository;
-    private final BankTransactionDeltaImportTask deltaImportTask;
+    private final TasksRepository tasksRepository;
 
     public ScheduledTasksWatcher(
             final ScheduleRepository scheduleRepository,
-            final BankTransactionDeltaImportTask deltaImportTask
+            final TasksRepository tasksRepository
     ) {
         this.scheduleRepository = scheduleRepository;
-        this.deltaImportTask = deltaImportTask;
+        this.tasksRepository = tasksRepository;
         watch();
     }
 
@@ -34,9 +34,14 @@ public class ScheduledTasksWatcher {
     private void watchScheduledTasks() {
         while (true) {
             try {
-                if (getScheduledTime(CHECK_INTERVAl).isPresent()) {
-                    logger.info("Scheduling task '{}' ...", deltaImportTask.getName());
-                    deltaImportTask.run();
+                final Optional<ScheduleTime> scheduledTime = getScheduledTime(CHECK_INTERVAl);
+                if (scheduledTime.isPresent()) {
+                    final TasksRepository.ImportTaskDescription task = tasksRepository.get(TasksRepository.ImportTaskIdentifier.valueOf(scheduledTime.get().getTaskIdentifier()));
+                    if (task == null) {
+                        return;
+                    }
+                    logger.info("Scheduling task '{}' ...", task.getImportTask().getName());
+                    task.getImportTask().run();
                 }
             } catch (Exception e) {
                 logger.error("Error while executing scheduled tasks", e);
