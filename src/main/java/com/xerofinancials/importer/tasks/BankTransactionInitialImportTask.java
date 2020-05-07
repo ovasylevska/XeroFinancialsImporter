@@ -63,8 +63,6 @@ public class BankTransactionInitialImportTask extends BankTransactionImportTask 
                         pageCount.get(),
                         UNIT_DECIMAL_PLACES
                 ));
-        resultsCount.set(bankTransactionData.getBankTransactions().size());
-        pageCount.increment();
         return bankTransactionData;
     }
 }

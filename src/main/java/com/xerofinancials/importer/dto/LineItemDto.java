@@ -1,6 +1,7 @@
 package com.xerofinancials.importer.dto;
 
 import com.xero.models.accounting.BankTransaction;
+import com.xero.models.accounting.Invoice;
 import com.xero.models.accounting.LineItem;
 import com.xero.models.accounting.LineItemTracking;
 
@@ -9,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class LineItemDto {
     private String lineItemId;
-    private String bankTransactionId;
     private String description;
     private Double quantity;
     private Double unitAmount;
@@ -23,12 +23,42 @@ public class LineItemDto {
     private Double discountAmount;
     private String repeatingInvoiceID;
 
+    private String bankTransactionId;
+    private String invoiceId;
+
     public LineItemDto (LineItem xeroLineItem, BankTransaction xeroBankTransaction) {
         if (xeroLineItem == null) {
             return;
         }
         this.lineItemId = xeroLineItem.getLineItemID().toString();
         this.bankTransactionId = xeroBankTransaction.getBankTransactionID().toString();
+        this.description = xeroLineItem.getDescription();
+        this.quantity = xeroLineItem.getQuantity() != null ? xeroLineItem.getQuantity().doubleValue() : null;
+        this.unitAmount = xeroLineItem.getUnitAmount() != null ? xeroLineItem.getUnitAmount().doubleValue() : null;
+        this.itemCode = xeroLineItem.getItemCode();
+        this.accountCode = xeroLineItem.getAccountCode();
+        this.taxType = xeroLineItem.getTaxType();
+        this.taxAmount = xeroLineItem.getTaxAmount();
+        this.lineAmount = xeroLineItem.getLineAmount();
+        if (xeroLineItem.getTracking() != null) {
+            this.tracking = xeroLineItem.getTracking()
+                    .stream()
+                    .map(LineItemTracking::toString)
+                    .collect(Collectors.joining(", "));
+        }
+        this.discountRate = xeroLineItem.getDiscountRate();
+        this.discountAmount = xeroLineItem.getDiscountAmount();
+        if (xeroLineItem.getRepeatingInvoiceID() != null) {
+            this.repeatingInvoiceID = xeroLineItem.getRepeatingInvoiceID().toString();
+        }
+    }
+
+    public LineItemDto (LineItem xeroLineItem, Invoice xeroInvoice) {
+        if (xeroLineItem == null) {
+            return;
+        }
+        this.lineItemId = xeroLineItem.getLineItemID().toString();
+        this.invoiceId = xeroInvoice.getInvoiceID().toString();
         this.description = xeroLineItem.getDescription();
         this.quantity = xeroLineItem.getQuantity() != null ? xeroLineItem.getQuantity().doubleValue() : null;
         this.unitAmount = xeroLineItem.getUnitAmount() != null ? xeroLineItem.getUnitAmount().doubleValue() : null;
@@ -104,6 +134,10 @@ public class LineItemDto {
 
     public String getBankTransactionId() {
         return bankTransactionId;
+    }
+
+    public String getInvoiceId() {
+        return invoiceId;
     }
 
     @Override

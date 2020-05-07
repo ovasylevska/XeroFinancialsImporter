@@ -80,7 +80,10 @@ public abstract class BankTransactionImportTask extends ImportTask {
         while(resultsCount.get() > 0) {
             final BankTransactions bankTransactionData = readBankTransactionData(pageCount, resultsCount);
             saveBankTransactionData(bankTransactionData);
+
             importStatistics.increaseNewBankTransactionsCount(bankTransactionData.getBankTransactions().size());
+            resultsCount.set(bankTransactionData.getBankTransactions().size());
+            pageCount.increment();
         }
         this.importStatistics = importStatistics;
     }

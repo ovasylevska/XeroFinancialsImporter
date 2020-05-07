@@ -6,14 +6,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class XeroApiLimitWatcher {
     private static final Logger logger = LoggerFactory.getLogger(XeroApiLimitWatcher.class);
-    private static final int MINUTE_LIMIT = 60;
-    private static final int DAY_LIMIT = 5_000;
+    private static final int DELTA = 10;
+    private static final int MINUTE_LIMIT = 60 - DELTA;
+    private static final int DAY_LIMIT = 5_000 - DELTA;
     private Map<Integer, Counter> CALLS_PER_MINUTE = new HashMap<>();
     private Map<Integer, Counter> CALLS_PER_DAY = new HashMap<>();
     private int lastCurrentMinute = 0;
@@ -46,9 +49,11 @@ public class XeroApiLimitWatcher {
     }
 
     private void waitIfNeeded(Counter callsDuringCurrentMinute, Counter callsDuringCurrentDay) {
-        if (callsDuringCurrentMinute.get() >= MINUTE_LIMIT) {
+        final Counter callsDuringPreviousMinute = CALLS_PER_MINUTE.get(this.lastCurrentMinute - 1);
+        final int total = callsDuringCurrentMinute.get() + (callsDuringPreviousMinute != null ? callsDuringPreviousMinute.get() : 0);
+        if (total >= MINUTE_LIMIT) {
             logger.info("Xero API minute limit is exceeded. Waiting for 60 seconds before making next request...");
-            wait(60);
+            wait(60 + DELTA);
         }
         if (callsDuringCurrentDay.get() >= DAY_LIMIT) {
             logger.info("Xero API day limit is exceeded. No more request this day.");
@@ -58,14 +63,18 @@ public class XeroApiLimitWatcher {
     }
 
     private void refreshIfNeeded() {
-        final int currentMinute = DateUtils.getCurrentDateTimeInUtc().getMinute();
         final int currentDay = DateUtils.getCurrentDateTimeInUtc().getDayOfYear();
         if (lastCurrentDay != currentDay) {
             CALLS_PER_DAY.clear();
         }
-        if (currentMinute != lastCurrentMinute) {
-            CALLS_PER_MINUTE.clear();
+
+        final List<Integer> minutesToClear = new ArrayList<>();
+        for (final Integer minute : CALLS_PER_MINUTE.keySet()) {
+            if (minute < lastCurrentMinute - DELTA) {
+                minutesToClear.add(minute);
+            }
         }
+        minutesToClear.forEach(minute -> CALLS_PER_MINUTE.remove(minute));
     }
 
     private void wait(int intervalInSeconds) {

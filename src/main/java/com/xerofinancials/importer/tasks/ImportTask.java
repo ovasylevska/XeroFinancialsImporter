@@ -57,7 +57,6 @@ public abstract class ImportTask {
             this.isRunning = true;
             validateIfAuthentificated();
             execute();
-            logger.info("Task '{}' is finished.", getName());
             taskLaunchHistoryRepository.save(getDataType());
             sendStatisticsEmail();
         } catch (DoNotRollbackException ne) {
@@ -69,6 +68,7 @@ public abstract class ImportTask {
             sendErrorEmail(e, "All new imported data will be rolled back");
         } finally {
             this.isRunning = false;
+            logger.info("Task '{}' is finished.", getName());
         }
     }
 

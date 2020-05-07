@@ -27,7 +27,7 @@ public class DatabaseMigrationConfig {
             return initAllDatabases(financialsDataSource, financialsAction);
         } else {
             initFinancialsDatabase(financialsDataSource, financialsAction);
-            return initImportersDatabase(importerDataSource, importerAction);
+            return initImporterDatabase(importerDataSource, importerAction);
         }
     }
 
@@ -42,21 +42,48 @@ public class DatabaseMigrationConfig {
     }
 
     private Flyway initFinancialsDatabase(DataSource datasource, String action) {
+        initAccountSchema(datasource, action);
+        initBankTransactionSchema(datasource, action);
+        return initInvoiceSchema(datasource, action);
+    }
+
+    private Flyway initBankTransactionSchema(DataSource datasource, String action) {
         final Flyway flyway = Flyway.configure()
                 .dataSource(datasource)
-                .locations(
-                        new Location("database/bank_transaction"),
-                        new Location("database/account")
-                )
-                .schemas("bank_transactions", "accounts")
+                .locations(new Location("database/bank_transaction"))
+                .schemas("bank_transactions")
                 .baselineOnMigrate(true)
                 .load();
-        logger.info("Starting database migration for 'financials' (account and bank transactions) data source...");
+        logger.info("Starting database migration for 'financials/bank transaction' data source...");
         executeFlywayAction(flyway, action);
         return flyway;
     }
 
-    private Flyway initImportersDatabase(DataSource datasource, String action) {
+    private Flyway initAccountSchema(DataSource datasource, String action) {
+        final Flyway flyway = Flyway.configure()
+                .dataSource(datasource)
+                .locations(new Location("database/account"))
+                .schemas("accounts")
+                .baselineOnMigrate(true)
+                .load();
+        logger.info("Starting database migration for 'financials/account' data source...");
+        executeFlywayAction(flyway, action);
+        return flyway;
+    }
+
+    private Flyway initInvoiceSchema(DataSource datasource, String action) {
+        final Flyway flyway = Flyway.configure()
+                .dataSource(datasource)
+                .locations(new Location("database/invoice"))
+                .schemas("invoices")
+                .baselineOnMigrate(true)
+                .load();
+        logger.info("Starting database migration for 'financials/invoice' data source...");
+        executeFlywayAction(flyway, action);
+        return flyway;
+    }
+
+    private Flyway initImporterDatabase(DataSource datasource, String action) {
         final Flyway flyway = Flyway.configure()
                 .dataSource(datasource)
                 .locations(new Location("database/importer"))
@@ -69,19 +96,10 @@ public class DatabaseMigrationConfig {
     }
 
     private Flyway initAllDatabases(DataSource dataSource, String action) {
-        Flyway flyway = Flyway.configure()
-                .dataSource(dataSource)
-                .locations(
-                        new Location("database/importer"),
-                        new Location("database/bank_transaction"),
-                        new Location("database/account")
-                )
-                .schemas("importer", "bank_transactions", "accounts")
-                .baselineOnMigrate(true)
-                .load();
-        logger.info("Starting database migration for 'financials' and 'importer' data sources...");
-        executeFlywayAction(flyway, action);
-        return flyway;
+        initAccountSchema(dataSource, action);
+        initBankTransactionSchema(dataSource, action);
+        initInvoiceSchema(dataSource, action);
+        return initImporterDatabase(dataSource, action);
     }
 
     private void executeFlywayAction(Flyway flyway, String action) {
