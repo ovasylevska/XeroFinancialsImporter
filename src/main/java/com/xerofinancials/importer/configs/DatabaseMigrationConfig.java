@@ -111,6 +111,10 @@ public class DatabaseMigrationConfig {
             flyway.clean();
             return;
         }
+        if ("baseline".equals(action)) {
+            flyway.baseline();
+            return;
+        }
         logger.info("Unsupported flyway migration '" + action + "'");
     }
 }
