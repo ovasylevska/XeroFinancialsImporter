@@ -69,7 +69,7 @@ public abstract class PaymentImportTask extends ImportTask {
         final Payments paymentData = readPaymentData();
         saveInvoiceData(paymentData);
 
-        importStatistics.increaseNewInvoicesCount(paymentData.getPayments().size());
+        importStatistics.increaseNewPaymentsCount(paymentData.getPayments().size());
         this.importStatistics = importStatistics;
     }
 
