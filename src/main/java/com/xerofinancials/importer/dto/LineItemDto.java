@@ -4,6 +4,7 @@ import com.xero.models.accounting.BankTransaction;
 import com.xero.models.accounting.Invoice;
 import com.xero.models.accounting.LineItem;
 import com.xero.models.accounting.LineItemTracking;
+import com.xerofinancials.importer.utils.StringUtils;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -35,8 +36,8 @@ public class LineItemDto {
         this.description = xeroLineItem.getDescription();
         this.quantity = xeroLineItem.getQuantity() != null ? xeroLineItem.getQuantity().doubleValue() : null;
         this.unitAmount = xeroLineItem.getUnitAmount() != null ? xeroLineItem.getUnitAmount().doubleValue() : null;
-        this.itemCode = xeroLineItem.getItemCode();
-        this.accountCode = xeroLineItem.getAccountCode();
+        this.itemCode = StringUtils.replaceEmptyWithNull(xeroLineItem.getItemCode());
+        this.accountCode = StringUtils.replaceEmptyWithNull(xeroLineItem.getAccountCode());
         this.taxType = xeroLineItem.getTaxType();
         this.taxAmount = xeroLineItem.getTaxAmount();
         this.lineAmount = xeroLineItem.getLineAmount();
@@ -62,8 +63,8 @@ public class LineItemDto {
         this.description = xeroLineItem.getDescription();
         this.quantity = xeroLineItem.getQuantity() != null ? xeroLineItem.getQuantity().doubleValue() : null;
         this.unitAmount = xeroLineItem.getUnitAmount() != null ? xeroLineItem.getUnitAmount().doubleValue() : null;
-        this.itemCode = xeroLineItem.getItemCode();
-        this.accountCode = xeroLineItem.getAccountCode();
+        this.itemCode = StringUtils.replaceEmptyWithNull(xeroLineItem.getItemCode());
+        this.accountCode = StringUtils.replaceEmptyWithNull(xeroLineItem.getAccountCode());
         this.taxType = xeroLineItem.getTaxType();
         this.taxAmount = xeroLineItem.getTaxAmount();
         this.lineAmount = xeroLineItem.getLineAmount();

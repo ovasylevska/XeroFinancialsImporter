@@ -1,6 +1,7 @@
 package com.xerofinancials.importer.dto;
 
 import com.xero.models.accounting.Account;
+import com.xerofinancials.importer.utils.StringUtils;
 
 import java.util.Objects;
 
@@ -13,7 +14,7 @@ public class BankAccountDto {
         if (xeroBankAccount != null) {
             this.bankAccountId = xeroBankAccount.getAccountID().toString();
             this.name = xeroBankAccount.getName();
-            this.code = xeroBankAccount.getCode();
+            this.code = StringUtils.replaceEmptyWithNull(xeroBankAccount.getCode());
         }
     }
 

@@ -2,6 +2,7 @@ package com.xerofinancials.importer.dto;
 
 import com.xero.models.accounting.Account;
 import com.xerofinancials.importer.utils.DateUtils;
+import com.xerofinancials.importer.utils.StringUtils;
 import org.threeten.bp.OffsetDateTime;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class AccountDto {
 
     public AccountDto(Account xeroAccount) {
         this.accountId = xeroAccount.getAccountID().toString();
-        this.accountCode = xeroAccount.getCode();
+        this.accountCode = StringUtils.replaceEmptyWithNull(xeroAccount.getCode());
         this.name = xeroAccount.getName();
         if (xeroAccount.getType() != null) {
             this.type = xeroAccount.getType().getValue();
