@@ -1,15 +1,16 @@
 package com.xerofinancials.importer.dto;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
 public class UniqueDto {
     private String uniqueHash;
 
     public String getUniqueHash() {
-        return DigestUtils.sha256Hex(toString());
+        return this.uniqueHash;
     }
 
     protected void generateUniqueHash() {
-        this.uniqueHash = DigestUtils.sha256Hex(toString());
+        this.uniqueHash = new String(Hex.encodeHex(DigestUtils.md5(toString())));
     }
 }
