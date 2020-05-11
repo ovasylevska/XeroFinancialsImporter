@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
@@ -40,35 +38,16 @@ public class BankAccountRepository extends RollbackSupportRepository {
             return;
         }
 
-        final String sql = "INSERT INTO bank_transactions.bank_accounts(bank_account_id, name, code) VALUES (?, ?, ?)";
+        final String sql = "INSERT INTO bank_transactions.bank_accounts(bank_account_id, name, code, unique_hash) " +
+                "VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT DO NOTHING";
 
         for (final List<BankAccountDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
-            final Set<String> existingBankAccountIds = getExistingBankAccountIds(partition);
-            final List<BankAccountDto> newBankAccounts = partition
+            List<Object[]> partitionData = partition
                     .stream()
-                    .filter(b -> !existingBankAccountIds.contains(b.getBankAccountId()))
-                    .collect(Collectors.toList());
-            List<Object[]> partitionData = newBankAccounts
-                    .stream()
-                    .map(b -> new Object[]{b.getBankAccountId(), b.getName(), b.getCode()})
+                    .map(b -> new Object[]{b.getBankAccountId(), b.getName(), b.getCode(), b.getUniqueHash()})
                     .collect(Collectors.toList());
             jdbc.batchUpdate(sql, partitionData);
         }
-    }
-
-    private Set<String> getExistingBankAccountIds(List<BankAccountDto> data) {
-        final Set<String> result = new HashSet<>();
-        final String sql = "SELECT bank_account_id " +
-                "FROM bank_transactions.bank_accounts " +
-                "WHERE bank_account_id IN ("
-                + data
-                .stream()
-                .map(b -> "'" + b.getBankAccountId() + "'")
-                .collect(Collectors.joining(", "))
-                + ")";
-        jdbc.query(sql, rs -> {
-            result.add(rs.getString("bank_account_id"));
-        });
-        return result;
     }
 }

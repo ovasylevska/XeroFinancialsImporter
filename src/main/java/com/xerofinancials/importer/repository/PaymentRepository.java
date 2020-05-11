@@ -59,8 +59,10 @@ public class PaymentRepository extends RollbackSupportRepository {
                 "bank_account_number, " +
                 "particulars, " +
                 "details, " +
-                "has_account " +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "has_account, " +
+                "unique_hash " +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT DO NOTHING";
         for (final List<PaymentDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
             List<Object[]> partitionData = partition
                     .stream()
@@ -85,7 +87,8 @@ public class PaymentRepository extends RollbackSupportRepository {
                             p.getBankAccountNumber(),
                             p.getParticulars(),
                             p.getDetails(),
-                            p.getHasAccount()
+                            p.getHasAccount(),
+                            p.getUniqueHash()
                     })
                     .collect(Collectors.toList());
 

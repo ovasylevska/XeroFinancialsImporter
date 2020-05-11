@@ -4,7 +4,7 @@ import com.xero.models.accounting.Contact;
 
 import java.util.Objects;
 
-public class ContactDto {
+public class ContactDto extends UniqueDto {
     private String contactId;
     private String name;
 
@@ -12,6 +12,7 @@ public class ContactDto {
         if (xeroContact != null) {
             this.contactId = xeroContact.getContactID().toString();
             this.name = xeroContact.getName();
+            generateUniqueHash();
         }
     }
 
@@ -34,5 +35,12 @@ public class ContactDto {
     @Override
     public int hashCode() {
         return Objects.hash(contactId);
+    }
+
+    @Override
+    public String toString() {
+        return "ContactDto{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

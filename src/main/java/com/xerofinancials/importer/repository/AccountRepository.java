@@ -57,8 +57,10 @@ public class AccountRepository extends RollbackSupportRepository {
                 "reporting_code_name, " +
                 "has_attachments, " +
                 "updated_date_utc, " +
-                "add_to_watch_list " +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "add_to_watch_list," +
+                "unique_hash " +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT DO NOTHING";
 
         for (final List<AccountDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
 
@@ -83,7 +85,8 @@ public class AccountRepository extends RollbackSupportRepository {
                             t.getReportingCodeName(),
                             t.getHasAttachments(),
                             t.getUpdatedDateUtc(),
-                            t.getAddToWatchList()
+                            t.getAddToWatchList(),
+                            t.getUniqueHash()
                     })
                     .collect(Collectors.toList());
 

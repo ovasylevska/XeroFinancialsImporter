@@ -67,8 +67,10 @@ public class InvoiceRepository extends RollbackSupportRepository {
                 "fully_paid_on_date, " +
                 "amount_credited, " +
                 "updated_date_utc, " +
-                "status_attribute_string" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "status_attribute_string, " +
+                "unique_hash " +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT DO NOTHING";
         for (final List<InvoiceDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
             List<Object[]> partitionData = partition
                     .stream()
@@ -101,7 +103,8 @@ public class InvoiceRepository extends RollbackSupportRepository {
                             i.getFullyPaidOnDate(),
                             i.getAmountCredited(),
                             i.getUpdatedDateUTC(),
-                            i.getStatusAttributeString()
+                            i.getStatusAttributeString(),
+                            i.getUniqueHash()
                     })
                     .collect(Collectors.toList());
             jdbc.batchUpdate(sql, partitionData);

@@ -2,13 +2,14 @@ package com.xerofinancials.importer.dto;
 
 import com.xero.models.accounting.BankTransaction;
 import com.xerofinancials.importer.utils.DateUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.threeten.bp.OffsetDateTime;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class BankTransactionDto {
+public class BankTransactionDto extends UniqueDto {
     private String bankTransactionId;
     private String type;
     private String contactId;
@@ -76,6 +77,7 @@ public class BankTransactionDto {
         }
         this.hasAttachments = xeroBankTransaction.getHasAttachments() ? 1 : 0;
         this.statusAttributeString = xeroBankTransaction.getStatusAttributeString();
+        getUniqueHash();
     }
 
     public String getBankTransactionId() {
@@ -169,5 +171,30 @@ public class BankTransactionDto {
     @Override
     public int hashCode() {
         return Objects.hash(bankTransactionId);
+    }
+
+    @Override
+    public String toString() {
+        return "BankTransactionDto{" +
+                "type='" + type + '\'' +
+                ", contactId='" + contactId + '\'' +
+                ", bankAccountId='" + bankAccountId + '\'' +
+                ", isReconciled=" + isReconciled +
+                ", date=" + date +
+                ", reference='" + reference + '\'' +
+                ", currencyCode='" + currencyCode + '\'' +
+                ", currencyRate=" + currencyRate +
+                ", url='" + url + '\'' +
+                ", status='" + status + '\'' +
+                ", lineAmountTypes='" + lineAmountTypes + '\'' +
+                ", subTotal=" + subTotal +
+                ", totalTax=" + totalTax +
+                ", total=" + total +
+                ", prepaymentId='" + prepaymentId + '\'' +
+                ", overpaymentId='" + overpaymentId + '\'' +
+                ", updatedDateUTC=" + updatedDateUTC +
+                ", hasAttachments=" + hasAttachments +
+                ", statusAttributeString='" + statusAttributeString + '\'' +
+                '}';
     }
 }

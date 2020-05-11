@@ -11,7 +11,7 @@ import com.xerofinancials.importer.dto.LineItemDto;
 import com.xerofinancials.importer.enums.XeroDataType;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
-import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
+import com.xerofinancials.importer.repository.BankTransactionRepository;
 import com.xerofinancials.importer.repository.LineItemRepository;
 import com.xerofinancials.importer.repository.TaskLaunchHistoryRepository;
 import com.xerofinancials.importer.service.EmailService;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 public abstract class BankTransactionImportTask extends ImportTask {
     private static final Logger logger = LoggerFactory.getLogger(BankTransactionImportTask.class);
-    final FinancialsBankTransactionRepository bankTransactionRepository;
+    final BankTransactionRepository bankTransactionRepository;
     final ContactRepository contactRepository;
     final BankAccountRepository bankAccountRepository;
     final LineItemRepository lineItemRepository;
@@ -39,7 +39,7 @@ public abstract class BankTransactionImportTask extends ImportTask {
     protected BankTransactionImportTask(
             final TaskLaunchHistoryRepository taskLaunchHistoryRepository,
             final TokenStorage tokenStorage,
-            final FinancialsBankTransactionRepository bankTransactionRepository,
+            final BankTransactionRepository bankTransactionRepository,
             final ContactRepository contactRepository,
             final BankAccountRepository bankAccountRepository,
             final LineItemRepository lineItemRepository,

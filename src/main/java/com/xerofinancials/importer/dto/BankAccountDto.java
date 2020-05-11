@@ -5,7 +5,7 @@ import com.xerofinancials.importer.utils.StringUtils;
 
 import java.util.Objects;
 
-public class BankAccountDto {
+public class BankAccountDto extends UniqueDto {
     private String bankAccountId;
     private String name;
     private String code;
@@ -15,6 +15,7 @@ public class BankAccountDto {
             this.bankAccountId = xeroBankAccount.getAccountID().toString();
             this.name = xeroBankAccount.getName();
             this.code = StringUtils.replaceEmptyWithNull(xeroBankAccount.getCode());
+            generateUniqueHash();
         }
     }
 
@@ -41,5 +42,13 @@ public class BankAccountDto {
     @Override
     public int hashCode() {
         return Objects.hash(bankAccountId);
+    }
+
+    @Override
+    public String toString() {
+        return "BankAccountDto{" +
+                "name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                '}';
     }
 }

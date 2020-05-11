@@ -28,7 +28,7 @@ public class ImportStatistics {
 
     @Override
     public String toString() {
-        return "ImportStatistics : {" +
+        return "ImportStatistics (not unique count) : {" +
                 "Bank Transactions Count = " + newBankTransactionsCount +
                 ", Accounts Count = " + newAccountsCount +
                 ", Invoices Count = " + newInvoicesCount +

@@ -7,7 +7,7 @@ import org.threeten.bp.OffsetDateTime;
 
 import java.time.LocalDateTime;
 
-public class AccountDto {
+public class AccountDto extends UniqueDto {
     private String accountId;
     private String accountCode;
     private String name;
@@ -139,5 +139,29 @@ public class AccountDto {
 
     public int getAddToWatchList() {
         return addToWatchList;
+    }
+
+    @Override
+    public String toString() {
+        return "AccountDto{" +
+                "accountCode='" + accountCode + '\'' +
+                ", name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", bankAccountNumber='" + bankAccountNumber + '\'' +
+                ", status='" + status + '\'' +
+                ", description='" + description + '\'' +
+                ", bankAccountType='" + bankAccountType + '\'' +
+                ", currencyCode='" + currencyCode + '\'' +
+                ", taxType='" + taxType + '\'' +
+                ", enablePaymentsToAccount=" + enablePaymentsToAccount +
+                ", showInExpenseClaims=" + showInExpenseClaims +
+                ", propertyClass='" + propertyClass + '\'' +
+                ", systemAccount='" + systemAccount + '\'' +
+                ", reportingCode='" + reportingCode + '\'' +
+                ", reportingCodeName='" + reportingCodeName + '\'' +
+                ", hasAttachments=" + hasAttachments +
+                ", updatedDateUtc=" + updatedDateUtc +
+                ", addToWatchList=" + addToWatchList +
+                '}';
     }
 }

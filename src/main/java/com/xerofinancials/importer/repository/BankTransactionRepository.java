@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-public class FinancialsBankTransactionRepository extends RollbackSupportRepository {
+public class BankTransactionRepository extends RollbackSupportRepository {
     private static final int BATCH_SIZE = 1000;
     private final JdbcTemplate jdbc;
 
-    public FinancialsBankTransactionRepository(@Qualifier("financialsJdbcTemplate") JdbcTemplate jdbc) {
+    public BankTransactionRepository(@Qualifier("financialsJdbcTemplate") JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
 
@@ -58,8 +58,10 @@ public class FinancialsBankTransactionRepository extends RollbackSupportReposito
                 "overpayment_id, " +
                 "updated_date_utc, " +
                 "has_attachments, " +
-                "status_attribute_string " +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "status_attribute_string, " +
+                "unique_hash " +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT DO NOTHING";
 
         for (final List<BankTransactionDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
 
@@ -85,7 +87,8 @@ public class FinancialsBankTransactionRepository extends RollbackSupportReposito
                             t.getOverpaymentId(),
                             t.getUpdatedDateUTC(),
                             t.getHasAttachments(),
-                            t.getStatusAttributeString()
+                            t.getStatusAttributeString(),
+                            t.getUniqueHash()
                     })
                     .collect(Collectors.toList());
 

@@ -52,8 +52,10 @@ public class LineItemRepository extends RollbackSupportRepository {
                 "tracking, " +
                 "discount_rate, " +
                 "discount_amount, " +
-                "repeating_invoice_id" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "repeating_invoice_id, " +
+                "unique_hash " +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "ON CONFLICT DO NOTHING";
 
         for (final List<LineItemDto> partition : ListUtils.partitions(data, BATCH_SIZE)) {
             List<Object[]> partitionData = partition
@@ -72,7 +74,8 @@ public class LineItemRepository extends RollbackSupportRepository {
                             l.getTracking(),
                             l.getDiscountRate(),
                             l.getDiscountAmount(),
-                            l.getRepeatingInvoiceID()
+                            l.getRepeatingInvoiceID(),
+                            l.getUniqueHash()
                     })
                     .collect(Collectors.toList());
             jdbc.batchUpdate(sql, partitionData);

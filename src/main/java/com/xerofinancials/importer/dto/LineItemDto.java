@@ -9,7 +9,7 @@ import com.xerofinancials.importer.utils.StringUtils;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class LineItemDto {
+public class LineItemDto extends UniqueDto {
     private String lineItemId;
     private String description;
     private Double quantity;
@@ -152,5 +152,25 @@ public class LineItemDto {
     @Override
     public int hashCode() {
         return Objects.hash(lineItemId);
+    }
+
+    @Override
+    public String toString() {
+        return "LineItemDto{" +
+                "description='" + description + '\'' +
+                ", quantity=" + quantity +
+                ", unitAmount=" + unitAmount +
+                ", itemCode='" + itemCode + '\'' +
+                ", accountCode='" + accountCode + '\'' +
+                ", taxType='" + taxType + '\'' +
+                ", taxAmount=" + taxAmount +
+                ", lineAmount=" + lineAmount +
+                ", tracking='" + tracking + '\'' +
+                ", discountRate=" + discountRate +
+                ", discountAmount=" + discountAmount +
+                ", repeatingInvoiceID='" + repeatingInvoiceID + '\'' +
+                ", bankTransactionId='" + bankTransactionId + '\'' +
+                ", invoiceId='" + invoiceId + '\'' +
+                '}';
     }
 }

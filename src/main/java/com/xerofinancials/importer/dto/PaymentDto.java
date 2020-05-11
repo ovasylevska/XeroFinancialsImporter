@@ -7,7 +7,7 @@ import org.threeten.bp.OffsetDateTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class PaymentDto {
+public class PaymentDto extends UniqueDto {
     private String paymentId;
     private String invoiceId;
     private String creditNote; //todo : ???
@@ -154,5 +154,31 @@ public class PaymentDto {
 
     public int getHasAccount() {
         return hasAccount;
+    }
+
+    @Override
+    public String toString() {
+        return "PaymentDto{" +
+                "invoiceId='" + invoiceId + '\'' +
+                ", creditNote='" + creditNote + '\'' +
+                ", prepayment='" + prepayment + '\'' +
+                ", overpayment='" + overpayment + '\'' +
+                ", invoiceNumber='" + invoiceNumber + '\'' +
+                ", creditNoteNumber='" + creditNoteNumber + '\'' +
+                ", accountId='" + accountId + '\'' +
+                ", code='" + code + '\'' +
+                ", paymentDate=" + paymentDate +
+                ", currencyRate=" + currencyRate +
+                ", amount=" + amount +
+                ", reference='" + reference + '\'' +
+                ", isReconciled=" + isReconciled +
+                ", status='" + status + '\'' +
+                ", paymentType='" + paymentType + '\'' +
+                ", updatedDateUTC=" + updatedDateUTC +
+                ", bankAccountNumber='" + bankAccountNumber + '\'' +
+                ", particulars='" + particulars + '\'' +
+                ", details='" + details + '\'' +
+                ", hasAccount=" + hasAccount +
+                '}';
     }
 }

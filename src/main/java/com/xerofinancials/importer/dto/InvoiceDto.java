@@ -7,7 +7,7 @@ import org.threeten.bp.OffsetDateTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class InvoiceDto {
+public class InvoiceDto extends UniqueDto {
     private String invoiceID;
     private String invoiceType;
     private String contactId;
@@ -218,5 +218,39 @@ public class InvoiceDto {
 
     public String getStatusAttributeString() {
         return statusAttributeString;
+    }
+
+    @Override
+    public String toString() {
+        return "InvoiceDto{" +
+                "invoiceType='" + invoiceType + '\'' +
+                ", contactId='" + contactId + '\'' +
+                ", date=" + date +
+                ", dueDate=" + dueDate +
+                ", lineAmountTypes='" + lineAmountTypes + '\'' +
+                ", invoiceNumber='" + invoiceNumber + '\'' +
+                ", reference='" + reference + '\'' +
+                ", brandingThemeID='" + brandingThemeID + '\'' +
+                ", url='" + url + '\'' +
+                ", currencyCode='" + currencyCode + '\'' +
+                ", currencyRate=" + currencyRate +
+                ", status='" + status + '\'' +
+                ", sentToContact=" + sentToContact +
+                ", expectedPaymentDate=" + expectedPaymentDate +
+                ", plannedPaymentDate=" + plannedPaymentDate +
+                ", ciSDeduction=" + ciSDeduction +
+                ", subTotal=" + subTotal +
+                ", totalTax=" + totalTax +
+                ", total=" + total +
+                ", totalDiscount=" + totalDiscount +
+                ", hasAttachments=" + hasAttachments +
+                ", isDiscounted=" + isDiscounted +
+                ", amountDue=" + amountDue +
+                ", amountPaid=" + amountPaid +
+                ", fullyPaidOnDate=" + fullyPaidOnDate +
+                ", amountCredited=" + amountCredited +
+                ", updatedDateUTC=" + updatedDateUTC +
+                ", statusAttributeString='" + statusAttributeString + '\'' +
+                '}';
     }
 }

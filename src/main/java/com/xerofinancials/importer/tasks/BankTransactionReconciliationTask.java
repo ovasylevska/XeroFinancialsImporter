@@ -3,7 +3,7 @@ package com.xerofinancials.importer.tasks;
 import com.xero.models.accounting.BankTransactions;
 import com.xerofinancials.importer.repository.BankAccountRepository;
 import com.xerofinancials.importer.repository.ContactRepository;
-import com.xerofinancials.importer.repository.FinancialsBankTransactionRepository;
+import com.xerofinancials.importer.repository.BankTransactionRepository;
 import com.xerofinancials.importer.repository.LineItemRepository;
 import com.xerofinancials.importer.repository.TaskLaunchHistoryRepository;
 import com.xerofinancials.importer.service.EmailService;
@@ -19,7 +19,7 @@ public class BankTransactionReconciliationTask extends BankTransactionImportTask
     private final TokenStorage tokenStorage;
 
     public BankTransactionReconciliationTask(
-            final FinancialsBankTransactionRepository bankTransactionRepository,
+            final BankTransactionRepository bankTransactionRepository,
             final ContactRepository contactRepository,
             final BankAccountRepository bankAccountRepository,
             final LineItemRepository lineItemRepository,
