@@ -68,6 +68,7 @@ public abstract class ImportTask {
             sendErrorEmail(e, "All new imported data will be rolled back");
         } finally {
             this.isRunning = false;
+            printStatistics();
             logger.info("Task '{}' is finished.", getName());
         }
     }
@@ -119,6 +120,12 @@ public abstract class ImportTask {
                     "Task execution completed",
                     Collections.singletonList("Task '" + getName() + "' is completed. " + importStatistics.toString())
             );
+        }
+    }
+
+    private void printStatistics() {
+        if (importStatistics != null) {
+            logger.info(importStatistics.toString());
         }
     }
 

@@ -8,8 +8,10 @@ import com.xerofinancials.importer.tasks.BankTransactionDeltaImportTask;
 import com.xerofinancials.importer.tasks.BankTransactionInitialImportTask;
 import com.xerofinancials.importer.tasks.BankTransactionReconciliationTask;
 import com.xerofinancials.importer.tasks.ImportTask;
+import com.xerofinancials.importer.tasks.InvoiceDeltaImportTask;
 import com.xerofinancials.importer.tasks.InvoiceInitialImportTask;
 import com.xerofinancials.importer.tasks.InvoiceReconciliationTask;
+import com.xerofinancials.importer.tasks.PaymentDeltaImportTask;
 import com.xerofinancials.importer.tasks.PaymentInitialImportTask;
 import com.xerofinancials.importer.tasks.PaymentReconciliationTask;
 import org.springframework.stereotype.Repository;
@@ -25,8 +27,10 @@ import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskI
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.BANK_TRANSACTION_DELTA;
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.BANK_TRANSACTION_INITIAL;
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.BANK_TRANSACTION_RECONCILIATION;
+import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.INVOICE_DELTA;
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.INVOICE_INITIAL;
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.INVOICE_RECONCILIATION;
+import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.PAYMENT_DELTA;
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.PAYMENT_INITIAL;
 import static com.xerofinancials.importer.repository.TasksRepository.ImportTaskIdentifier.PAYMENT_RECONCILIATION;
 
@@ -42,8 +46,10 @@ public class TasksRepository {
             AccountDeltaImportTask accountDeltaImportTask,
             AccountReconciliationTask accountReconciliationTask,
             InvoiceInitialImportTask invoiceInitialImportTask,
+            InvoiceDeltaImportTask invoiceDeltaImportTask,
             InvoiceReconciliationTask invoiceReconciliationTask,
             PaymentInitialImportTask paymentInitialImportTask,
+            PaymentDeltaImportTask paymentDeltaImportTask,
             PaymentReconciliationTask paymentReconciliationTask
     ) {
         TASKS.put(BANK_TRANSACTION_INITIAL,
@@ -96,6 +102,13 @@ public class TasksRepository {
                         INVOICE_INITIAL
                 )
         );
+        TASKS.put(INVOICE_DELTA,
+                new ImportTaskDescription(
+                        "Invoice Delta Import",
+                        invoiceDeltaImportTask,
+                        INVOICE_DELTA
+                )
+        );
         TASKS.put(INVOICE_RECONCILIATION,
                 new ImportTaskDescription(
                         "Invoice Reconciliation",
@@ -109,6 +122,13 @@ public class TasksRepository {
                         "Payment Initial Import",
                         paymentInitialImportTask,
                         PAYMENT_INITIAL
+                )
+        );
+        TASKS.put(PAYMENT_DELTA,
+                new ImportTaskDescription(
+                        "Payment Delta Import",
+                        paymentDeltaImportTask,
+                        PAYMENT_DELTA
                 )
         );
         TASKS.put(PAYMENT_RECONCILIATION,
@@ -158,9 +178,11 @@ public class TasksRepository {
         ACCOUNT_RECONCILIATION,
 
         INVOICE_INITIAL,
+        INVOICE_DELTA,
         INVOICE_RECONCILIATION,
 
         PAYMENT_INITIAL,
+        PAYMENT_DELTA,
         PAYMENT_RECONCILIATION;
 
         public static ImportTaskIdentifier fromValue(String value) {
